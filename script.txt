@@ -1,0 +1,4 @@
+Section 0 (Opening):
+Section 1 (Introduction to chess)
+Section 2 (Introduction to chess engines)
+Section 3 ()
