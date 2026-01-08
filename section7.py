@@ -12,6 +12,7 @@ class Ending(BaseSection):
             font_size=30,
         ).to_edge(UP)
         self.play(Write(body_text))
+        self.wait(1.2)
         video = (
             VideoMobject("fools_mate_engine.mp4").scale_to_fit_height(5.5).to_edge(DOWN)
         )
@@ -27,6 +28,7 @@ class Ending(BaseSection):
             font_size=32,
         ).to_edge(UP)
         self.play(Transform(body_text, new_text))
+        self.wait(1.2)
 
         image = ImageMobject("pdf.png").scale_to_fit_height(5).to_edge(DOWN)
         self.play(FadeIn(image))
@@ -40,6 +42,7 @@ class Ending(BaseSection):
             font_size=32,
         ).to_edge(UP)
         self.play(Transform(body_text, new_text))
+        self.wait(1.2)
 
         image = ImageMobject("bishop_book.jpg").scale_to_fit_height(5).to_edge(DOWN)
         self.play(FadeIn(image))
@@ -53,6 +56,7 @@ class Ending(BaseSection):
             font_size=32,
         ).to_edge(UP)
         self.play(Transform(body_text, new_text))
+        self.wait(1.2)
 
         image = ImageMobject("3b1b.png").scale_to_fit_height(5).to_edge(DOWN)
         self.play(FadeIn(image))

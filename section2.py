@@ -39,7 +39,7 @@ class StockfishExplainer(Scene):
         # Faster move-to-corner transform (grow is fine; move is faster)
         self.play(
             Transform(logo, logo_target),
-            run_time=0.55,  # was 0.95
+            run_time=0.6,
             rate_func=rate_functions.ease_in_out_cubic,
         )
 
@@ -551,8 +551,8 @@ class StockfishExplainer(Scene):
         )
 
         self.wait(1)
-        
-        
+
+
         # --- Clean handoff: remove EVERYTHING from this segment (but don't touch outside text)
         leaf_group = VGroup(*[t for t in leaf_texts if t is not None])
 
@@ -575,16 +575,6 @@ class StockfishExplainer(Scene):
 
         self.play(FadeOut(cleanup), run_time=0.45)
 
-
-
-# ============================================================
-# Your original section, with ALL stockfish-related things removed.
-# The removed parts include:
-# - show_stockfish_tree()
-# - any "Traditional engines (e.g. Stockfish)" text
-# - any bridge text describing traditional engines/pruning
-# Replaced with: StockfishExplainer().construct() as the animation segment
-# ============================================================
 class EngineIntro(BaseSection):
     def show_alphazero_flowchart(self):
         # A clearer AlphaZero loop:
@@ -594,7 +584,7 @@ class EngineIntro(BaseSection):
         # 4) Train the net to match pi and predict z
         # 5) Repeat
 
-        center = 2 * LEFT + DOWN
+        center = 2 * LEFT + DOWN * 0.6
 
         boxes = [
             RoundedRectangle(width=3.6, height=1.05, corner_radius=0.25)
@@ -665,10 +655,10 @@ class EngineIntro(BaseSection):
             Text("π = improved move probabilities (from MCTS)", font_size=20),
             Text("z = final game result (+1 win / 0 draw / -1 loss)", font_size=20),
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.15)
-        legend.to_edge(DOWN).shift(RIGHT * 0.5)
+        legend.to_edge(DOWN, buff=0.35).shift(RIGHT * 0.5)
 
         self.play(FadeIn(legend, shift=UP * 0.15), run_time=0.35)
-        self.wait(0.8)
+        self.wait(1.6)
         self.play(FadeOut(legend), run_time=0.3)
 
     def show_transformer(self):
@@ -694,7 +684,7 @@ class EngineIntro(BaseSection):
             Write(input_label),
             LaggedStart(*[Create(t) for t in tokens], lag_ratio=0.2),
         )
-        self.wait(0.5)
+        self.wait(1.0)
 
         attention_lines = VGroup()
         for i in range(len(tokens)):
@@ -713,7 +703,7 @@ class EngineIntro(BaseSection):
         attention_label.next_to(attention_lines, DOWN)
 
         self.play(Create(attention_lines), Write(attention_label))
-        self.wait(1)
+        self.wait(1.6)
         self.play(FadeOut(attention_lines), FadeOut(attention_label))
 
         block = RoundedRectangle(
@@ -748,7 +738,7 @@ class EngineIntro(BaseSection):
 
         self.play(LaggedStart(*[Create(a) for a in arrows_down], lag_ratio=0.15))
         self.play(Create(transformer))
-        self.wait(1)
+        self.wait(1.5)
 
         output_tokens = tokens.copy()
         output_tokens.next_to(transformer, DOWN).shift(1 * DOWN)
@@ -774,15 +764,20 @@ class EngineIntro(BaseSection):
         self.play(LaggedStart(*[Create(t) for t in output_tokens], lag_ratio=0.2))
         self.play(Write(output_label))
 
-        self.wait(2)
+        self.wait(2.8)
 
     def construct(self):
+        def fit_paragraph(text_obj, max_width=12.7):
+            if text_obj.width > max_width:
+                text_obj.scale_to_fit_width(max_width)
+            return text_obj
+
         top_text = Paragraph("There are 2 main types of chess engines", font_size=30).to_edge(
             UP
         )
 
         self.play(Write(top_text))
-        self.wait()
+        self.wait(1.2)
 
         # =============================
         # 1) (Stockfish-related text removed)
@@ -800,33 +795,42 @@ class EngineIntro(BaseSection):
         # =============================
         new_text = Paragraph("2. Neural networks", font_size=30).to_edge(UP)
         self.play(Transform(top_text, new_text))
-        self.wait(0.2)
+        self.wait(0.4)
 
         body_text = Paragraph(
-            "AlphaZero-style engines don’t rely on hand-written evaluation rules.",
-            "Instead, a neural network predicts:",
-            "• which moves look promising (policy) and • how good the position is (value).",
-            font_size=30,
+            "AlphaZero learns by self-play: it plays against itself",
+            "to build intuition for chess.",
+            "The network outputs two things:",
+            "policy = likely moves, value = how good the position is.",
+            font_size=28,
+            line_spacing=0.9,
         ).next_to(top_text, DOWN)
+        fit_paragraph(body_text)
         self.play(Write(body_text))
-        self.wait(0.8)
+        self.wait(1.8)
 
         new_text = Paragraph(
-            "During play, they combine the network with Monte Carlo Tree Search (MCTS):",
-            "the network guides which branches to explore, and MCTS improves the move choice.",
-            font_size=30,
+            "During play, it uses Monte Carlo Tree Search (MCTS):",
+            "simulate a few futures, guided by the network,",
+            "then pick the move that looks best.",
+            font_size=28,
+            line_spacing=0.9,
         ).next_to(top_text, DOWN)
+        fit_paragraph(new_text)
         self.play(Transform(body_text, new_text))
-        self.wait(0.8)
+        self.wait(1.8)
 
         new_text = Paragraph(
             "Training is a loop:",
-            "self-play games generate data, and the network is updated to match",
-            "the improved search decisions and the final game outcome.",
-            font_size=30,
+            "self-play generates new games,",
+            "then the network is updated to match the search",
+            "and the final game result. Repeat.",
+            font_size=28,
+            line_spacing=0.9,
         ).next_to(top_text, DOWN)
+        fit_paragraph(new_text)
         self.play(Transform(body_text, new_text))
-        self.wait(0.4)
+        self.wait(1.4)
 
         self.show_alphazero_flowchart()
 

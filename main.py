@@ -1,5 +1,5 @@
+import glob
 import os
-import subprocess
 
 VIDEO_FILE = "video_files.txt"
 RESOLUTION = {
@@ -25,13 +25,9 @@ for part in parts:
     os.system(f"manim -q{QUALITY} {part}.py")
 
 with open(VIDEO_FILE, "w") as file:
-    file.write(
-        "\n".join(
-            f"file '{subprocess.check_output(
-        f"ls media/videos/{part}/{RESOLUTION[QUALITY]}/*.mp4", shell=True
-    ).decode().strip()}'"
-            for part in parts
-        )
-    )
+    for part in parts:
+        pattern = f"media/videos/{part}/{RESOLUTION[QUALITY]}/*.mp4"
+        for path in sorted(glob.glob(pattern)):
+            file.write(f"file '{path}'\n")
 
 os.system(f"ffmpeg -y -f concat -i video_files.txt output_{RESOLUTION[QUALITY]}.mp4")

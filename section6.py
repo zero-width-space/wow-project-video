@@ -12,6 +12,7 @@ class Demonstration(BaseSection):
             font_size=30,
         ).to_edge(UP)
         self.play(Write(top_text))
+        self.wait(1.5)
 
         video = VideoMobject("demonstration.mp4").scale_to_fit_height(5.5).to_edge(DOWN)
         self.add(video)
@@ -23,5 +24,5 @@ class Demonstration(BaseSection):
             font_size=30,
         ).to_edge(UP)
         self.play(Transform(top_text, new_text))
-        self.wait(2)
+        self.wait(3)
         self.fade_out()

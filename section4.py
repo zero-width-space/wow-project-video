@@ -9,7 +9,6 @@ from manim import *
 # ============================================================
 # Global styling
 # ============================================================
-BG = "#0b0f14"
 WHITE_SOFT = "#e9eef5"
 
 ACCENT = BLUE_C
@@ -31,11 +30,11 @@ SUB_Y = 2.78
 T = {
     "fade": 0.8,
     "move": 1.0,
-    "reveal": 1.2,
-    "slow": 2.2,
-    "hold_short": 1.2,
-    "hold": 2.4,
-    "hold_long": 4.0,
+    "reveal": 1.3,
+    "slow": 2.6,
+    "hold_short": 1.6,
+    "hold": 3.0,
+    "hold_long": 5.0,
 }
 
 
@@ -44,6 +43,7 @@ def title(text: str) -> Text:
     if t.width > (X_R - X_L):
         t.scale_to_fit_width(X_R - X_L)
     t.move_to(UP * TITLE_Y)
+    t.set_z_index(100)
     return t
 
 
@@ -299,8 +299,6 @@ def curved_attn_arrow(a: Mobject, b: Mobject, angle: float) -> CurvedArrow:
 # ============================================================
 class ChessTransformer(Scene):
     def construct(self):
-        self.camera.background_color = BG
-
         # ------------------------------------------------------------
         # 0) Hook: Search tree vs one forward pass
         # (unchanged)
@@ -390,17 +388,22 @@ class ChessTransformer(Scene):
         gpt = Text("GPT", font_size=120, weight=BOLD).set_color(WHITE)
         t_overlay = Text("T", font_size=120, weight=BOLD).set_color(HI)
         t_overlay.move_to(gpt[-1].get_center())
-        g = VGroup(gpt, t_overlay).move_to(UP * 1.2)
+        g = VGroup(gpt, t_overlay).move_to(UP * 1.35)
 
         trans = Text("Transformer", font_size=72, weight=BOLD).set_color(HI)
-        trans.next_to(g, DOWN, buff=0.65)
+        trans.next_to(g, DOWN, buff=0.85)
         arr = Arrow(
-            g.get_bottom(), trans.get_top(), buff=0.18, stroke_width=6
+            g.get_bottom(),
+            trans.get_top(),
+            buff=0.12,
+            stroke_width=10,
+            max_tip_length_to_length_ratio=0.12,
         ).set_color(WHITE)
 
-        expl = Text(
-            "Idea: let every part of the position interact with every other part",
-            font_size=32,
+        expl = Paragraph(
+            "Idea: let every part of the position interact with every other part,",
+            "so pieces, squares, and move info can influence each other.",
+            font_size=30,
         ).set_opacity(0.92)
         expl.next_to(trans, DOWN, buff=0.40)
 
@@ -408,6 +411,7 @@ class ChessTransformer(Scene):
         self.play(Create(arr), FadeIn(trans, shift=UP), run_time=T["reveal"])
         self.play(FadeIn(expl, shift=UP), run_time=T["reveal"])
         self.wait(T["hold"])
+        self.wait(T["hold_short"])
         self.play(
             FadeOut(g), FadeOut(arr), FadeOut(trans), FadeOut(expl), run_time=T["fade"]
         )
@@ -557,6 +561,14 @@ class ChessTransformer(Scene):
 
         eq79 = MathTex(r"77 + 1 + 1 = 79", font_size=50).set_color(HI)
         eq79.next_to(seq, DOWN, buff=0.28)
+        cls_note = small_label(
+            "CLS = special summary token. The model stores its final understanding here.",
+            24,
+        )
+        cls_note.next_to(eq79, DOWN, buff=0.22)
+        if cls_note.width > (X_R - X_L - 0.4):
+            cls_note.scale_to_fit_width(X_R - X_L - 0.4)
+            cls_note.next_to(eq79, DOWN, buff=0.22)
 
         # Proper action-space visualization
         mini = chessboard(2.55).move_to(LEFT * 4.25 + DOWN * 1.45)
@@ -581,7 +593,8 @@ class ChessTransformer(Scene):
         prom_txt.next_to(act_txt, DOWN, buff=0.22).align_to(act_txt, LEFT)
 
         self.play(FadeIn(seq, shift=DOWN), run_time=T["reveal"])
-        self.play(FadeIn(eq79, shift=UP), run_time=T["fade"])
+        self.play(FadeIn(eq79, shift=UP), FadeIn(cls_note, shift=UP), run_time=T["fade"])
+        self.wait(T["hold_short"])
 
         self.play(FadeIn(mini, scale=0.98), FadeIn(origin, scale=0.95), run_time=T["fade"])
         self.play(
@@ -598,6 +611,7 @@ class ChessTransformer(Scene):
         self.play(
             FadeOut(seq),
             FadeOut(eq79),
+            FadeOut(cls_note),
             FadeOut(mini),
             FadeOut(origin),
             FadeOut(rays),
@@ -672,19 +686,19 @@ class ChessTransformer(Scene):
         tok_chips = VGroup(*[chip(n, GREY_D, 20) for n in tok_names]).arrange(
             RIGHT, buff=0.18
         )
-        vecs = VGroup(*[VectorBar("512", height=2.05, color=ACCENT) for _ in tok_names]).arrange(
-            RIGHT, buff=0.42
-        )
+        vecs = VGroup(
+            *[VectorBar("512", height=2.05, color=ACCENT) for _ in tok_names]
+        ).arrange(RIGHT, buff=0.42)
         for i in range(5):
             tok_chips[i].next_to(vecs[i], UP, buff=0.14)
-        seq_in = VGroup(tok_chips, vecs).move_to(LEFT * 3.65 + DOWN * 0.10)
+        seq_in = VGroup(tok_chips, vecs).move_to(LEFT * 3.25 + DOWN * 0.15)
 
         ln = box("LayerNorm", w=2.3, h=0.75, color=GREY_D, size=22).move_to(
             LEFT * 0.35 + UP * 1.40
         )
-        qkv = box("QKV projection\n(512 → 3×512)", w=3.2, h=1.15, color=ACCENT2, size=22).move_to(
-            LEFT * 0.35 + UP * 0.20
-        )
+        qkv = box(
+            "QKV projection\n(512 → 3×512)", w=3.2, h=1.15, color=ACCENT2, size=22
+        ).move_to(LEFT * 0.35 + UP * 0.20)
 
         a_ln = arrow_lr(seq_in, ln, buff=0.25)
         a_qkv = arrow_ud(ln, qkv, buff=0.20)
@@ -704,12 +718,15 @@ class ChessTransformer(Scene):
             run_time=T["fade"],
         )
 
-        attn_title = Text(
-            "Self-attention: one token mixes info from all tokens",
-            font_size=28,
-            weight=BOLD,
-        ).set_color(WHITE).set_opacity(0.95)
-        attn_title.move_to(RIGHT * 3.25 + UP * 2.35)
+        attn_title = (
+            Text(
+                "Self-attention: one token mixes info from all tokens",
+                font_size=28,
+                weight=BOLD,
+            )
+            .set_color(WHITE)
+            .set_opacity(0.95)
+        )
 
         focus = SurroundingRectangle(tok_chips[2], buff=0.08).set_stroke(HI, width=4)
 
@@ -723,19 +740,22 @@ class ChessTransformer(Scene):
 
         # Heatmap and equation: keep separated (no overlaps)
         hm = Heatmap5(cell=0.34).set_weights([[0.05] * 5 for _ in range(5)], color=ACCENT)
-        hm_lab = small_label("attention weights (softmax)", 22).next_to(hm, UP, buff=0.15).align_to(hm, LEFT)
-        hm_group = VGroup(hm_lab, hm).move_to(RIGHT * 3.35 + UP * 0.85)
+        hm_lab = small_label("attention weights (softmax)", 22)
+        hm_group = VGroup(hm_lab, hm).arrange(DOWN, buff=0.12)
 
-        eq = MathTex(r"\mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d}}\right)V", font_size=40).set_color(WHITE)
-        eq.move_to(RIGHT * 3.35 + DOWN * 0.55)
+        eq = MathTex(
+            r"\mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d}}\right)V",
+            font_size=36,
+        ).set_color(WHITE)
 
         out_vecs = VGroup(*[VectorBar("512", height=1.75, color=ACCENT) for _ in range(5)]).arrange(
             RIGHT, buff=0.32
         )
-        out_vecs.move_to(RIGHT * 3.35 + DOWN * 2.20)
-        out_lab = small_label("output token vectors (mixed info)", 22).next_to(out_vecs, UP, buff=0.18).align_to(
-            out_vecs, LEFT
-        )
+        out_lab = small_label("output token vectors (mixed info)", 22)
+        out_group = VGroup(out_lab, out_vecs).arrange(DOWN, buff=0.12)
+
+        rhs = VGroup(attn_title, hm_group, eq, out_group).arrange(DOWN, buff=0.25)
+        rhs.move_to(RIGHT * 3.35 + UP * 0.35)
 
         self.play(FadeIn(attn_title, shift=DOWN), run_time=T["fade"])
         self.play(Create(focus), run_time=T["fade"])
@@ -746,7 +766,7 @@ class ChessTransformer(Scene):
             ar.set_stroke(ACCENT, opacity=0.18 + 0.60 * w, width=2 + 10 * w)
         self.play(LaggedStart(*[FadeIn(ar) for ar in arrows], lag_ratio=0.06), run_time=T["reveal"])
 
-        self.play(FadeIn(hm_group, shift=LEFT), FadeIn(eq, shift=UP), run_time=T["reveal"])
+        self.play(FadeIn(hm_group, shift=LEFT), run_time=T["reveal"])
         wmat1 = [
             [0.05] * 5,
             [0.05] * 5,
@@ -769,7 +789,8 @@ class ChessTransformer(Scene):
         ]
         self.play(hm.animate_weights(wmat2, color=ACCENT), run_time=T["slow"])
 
-        self.play(FadeIn(out_vecs, shift=UP), FadeIn(out_lab, shift=UP), run_time=T["reveal"])
+        self.play(FadeIn(eq, shift=UP), run_time=T["reveal"])
+        self.play(FadeIn(out_group, shift=UP), run_time=T["reveal"])
         self.wait(T["hold_short"])
 
         # Clear attention visuals before next sub-part
@@ -779,8 +800,7 @@ class ChessTransformer(Scene):
             FadeOut(focus),
             FadeOut(hm_group),
             FadeOut(eq),
-            FadeOut(out_vecs),
-            FadeOut(out_lab),
+            FadeOut(out_group),
             run_time=T["fade"],
         )
 
@@ -887,31 +907,60 @@ class ChessTransformer(Scene):
         blk_lab = Text("Transformer layer", font_size=24, weight=BOLD).set_color(WHITE).move_to(blk.get_center())
         one = VGroup(blk, blk_lab)
         stack = VGroup(*[one.copy() for _ in range(4)]).arrange(DOWN, buff=0.16)
-        stack.move_to(RIGHT * 0.9 + UP * 0.95)
+        stack.move_to(LEFT * 0.3 + UP * 0.95)
 
         br = Brace(stack, RIGHT, buff=0.18)
         times = Text("×12", font_size=34, weight=BOLD).set_color(HI)
         times.next_to(br, RIGHT, buff=0.14)
 
-        cls = chip("CLS = last token", GREY_D, 24).next_to(stack, DOWN, buff=0.45).align_to(stack, LEFT)
+        cls = chip("CLS = summary token (last position)", GREY_D, 22).next_to(
+            stack, DOWN, buff=0.45
+        ).align_to(stack, LEFT)
 
-        # wrap + slightly smaller font so it stays inside
-        head = box(
-            "Action-value head\n→ 128 bucket logits",
-            w=5.8,
-            h=1.15,
-            color=ACCENT,
-            size=26,
+        cls_vec = VectorBar("CLS (512)", height=2.2, color=HI).next_to(
+            stack, RIGHT, buff=0.55
+        ).shift(DOWN * 0.15)
+        a_cls = arrow_lr(stack, cls_vec, buff=0.25)
+
+        heads = VGroup(
+            box("Policy head\n→ 1968 move logits", w=2.9, h=0.95, color=ACCENT2, size=21),
+            box("Value head\n→ 128 win% buckets", w=2.9, h=0.95, color=ACCENT, size=21),
+            box("Action-value head\n→ 128 win% buckets", w=2.9, h=0.95, color=ACCENT2, size=21),
+        ).arrange(DOWN, buff=0.22)
+        heads.next_to(cls_vec, RIGHT, buff=0.45).shift(DOWN * 0.10)
+
+        head_arrows = VGroup(*[arrow_lr(cls_vec, h, buff=0.25) for h in heads])
+
+        bucket_note = small_label(
+            "Bucket = a small range of win probability (ex: 40-41%).",
+            22,
         )
-        head.next_to(cls, DOWN, buff=0.30).align_to(cls, LEFT)
+        bucket_note.next_to(heads, DOWN, buff=0.18).align_to(heads, LEFT)
+        if bucket_note.width > (X_R - X_L - 0.4):
+            bucket_note.scale_to_fit_width(X_R - X_L - 0.4)
+            bucket_note.next_to(heads, DOWN, buff=0.18).align_to(heads, LEFT)
 
         self.play(FadeIn(cfg, shift=RIGHT), run_time=T["reveal"])
         self.play(FadeIn(stack, shift=UP), FadeIn(br), FadeIn(times, shift=LEFT), run_time=T["reveal"])
         self.play(FadeIn(cls, shift=UP), run_time=T["fade"])
-        self.play(FadeIn(head, shift=UP), run_time=T["fade"])
-        self.wait(T["hold_short"])
+        self.play(Create(a_cls), FadeIn(cls_vec, shift=LEFT), run_time=T["reveal"])
+        self.play(FadeIn(heads, shift=LEFT), FadeIn(head_arrows, shift=LEFT), run_time=T["reveal"])
+        self.play(FadeIn(bucket_note, shift=UP), run_time=T["fade"])
+        self.wait(T["hold_long"])
 
-        self.play(FadeOut(cfg), FadeOut(stack), FadeOut(br), FadeOut(times), FadeOut(cls), FadeOut(head), run_time=T["fade"])
+        self.play(
+            FadeOut(cfg),
+            FadeOut(stack),
+            FadeOut(br),
+            FadeOut(times),
+            FadeOut(cls),
+            FadeOut(cls_vec),
+            FadeOut(a_cls),
+            FadeOut(heads),
+            FadeOut(head_arrows),
+            FadeOut(bucket_note),
+            run_time=T["fade"],
+        )
 
         # ------------------------------------------------------------
         # 7) Training loss: FIX overlap + pace + dot follows line properly
@@ -926,6 +975,11 @@ class ChessTransformer(Scene):
         buck = box("bucketize win_prob\n→ bucket id", w=3.5, h=1.25, color=ACCENT, size=24).move_to(
             LEFT * 0.9 + UP * 2.05
         )
+        buck_note = small_label("Bucket = a small win% range (0-1%, 1-2%, ...)", 20)
+        buck_note.next_to(buck, DOWN, buff=0.10).align_to(buck, LEFT)
+        if buck_note.width > (X_R - X_L - 0.4):
+            buck_note.scale_to_fit_width(X_R - X_L - 0.4)
+            buck_note.next_to(buck, DOWN, buff=0.10).align_to(buck, LEFT)
         logits = box("model outputs\n128 logits", w=3.1, h=1.25, color=GREY_D, size=24).move_to(
             RIGHT * 2.85 + UP * 2.05
         )
@@ -997,7 +1051,7 @@ class ChessTransformer(Scene):
         runchips.next_to(lr_g, UP, buff=0.25).align_to(lr_g, LEFT)
 
         self.play(FadeIn(rec, shift=RIGHT), run_time=T["fade"])
-        self.play(FadeIn(buck, shift=RIGHT), Create(a_rec), run_time=T["reveal"])
+        self.play(FadeIn(buck, shift=RIGHT), FadeIn(buck_note, shift=UP), Create(a_rec), run_time=T["reveal"])
         self.play(FadeIn(logits, shift=RIGHT), Create(a_b), run_time=T["reveal"])
         self.wait(0.3)
 
@@ -1017,6 +1071,7 @@ class ChessTransformer(Scene):
         self.play(
             FadeOut(rec),
             FadeOut(buck),
+            FadeOut(buck_note),
             FadeOut(logits),
             FadeOut(a_rec),
             FadeOut(a_b),

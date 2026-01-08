@@ -22,6 +22,7 @@ class OurModel(BaseSection):
             font_size=30,
         ).to_edge(UP)
         self.play(Transform(top_text, new_text))
+        self.wait(2)
 
         left_box = (
             RoundedRectangle(width=4, height=4, corner_radius=0.25)
@@ -57,6 +58,7 @@ class OurModel(BaseSection):
             font_size=30,
         ).to_edge(UP)
         self.play(Transform(top_text, new_text))
+        self.wait(1)
 
         image = ImageMobject("training.png").scale_to_fit_height(6).to_edge(DOWN)
         self.play(FadeIn(image))
@@ -70,13 +72,14 @@ class OurModel(BaseSection):
             font_size=30,
         ).to_edge(UP)
         self.play(Transform(top_text, new_text))
-        self.wait()
+        self.wait(1.5)
 
         new_text = Paragraph(
             "This model was run on our local computer",
             font_size=30,
         ).to_edge(UP)
         self.play(Transform(top_text, new_text))
+        self.wait(1)
 
         axes = Axes(
             x_range=(0, 1000000, 50000),
@@ -117,6 +120,7 @@ class OurModel(BaseSection):
             font_size=30,
         ).to_edge(UP)
         self.play(Transform(top_text, new_text))
+        self.wait(1)
 
         axes = Axes(
             x_range=(0, 300000, 10000),
