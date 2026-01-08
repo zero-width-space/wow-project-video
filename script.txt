@@ -1,12 +1,10 @@
 Section 0 (Opening):
-Hello, and welcome to our W@W project, on building an AI chess engine, using neural networks
-We are Li Dianheng, Tan Le Qian, and Miyazaki Keishi
+Hello everyone. Chess and programming has always been my hobby, so I decided to try out chess programming for our W@W project. Together with, we built an AI chess engine. This is a video about, made with manim.
 
 Section 1 (Introduction to chess):
-First, a brief introduction to chess
-Chess is a 2-player board game where the goal is to surround and capture the opponent's king, which is known as checkmate
-Different pieces can move in different ways, which adds to the complexity of the game
-Despite the simplicity of the rules, chess strategies can be complex, making it a good benchmark for testing the capabilities of computers
+This is chess, a 2-player board game where the goal is to checkmate the opponent's king. Different pieces can move in different ways, which adds to the complexity of the game.
+
+Despite the simplicity of the rules, chess strategies can be complex and , making it a good benchmark for testing the capabilities of computers. In recent years, chess has become a landmark testing ground for AI problem solving and decision making.
 A chess engine is a computer program that tries to play the best possible move at each point, in response to the user, to maximise its chances of winning 
 
 Section 2 (Introduction to chess engines):
