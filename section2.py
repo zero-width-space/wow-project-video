@@ -12,7 +12,6 @@ class EngineIntro(BaseSection):
         # =============================
         # GLOBAL LOOK + SAFE LAYOUT
         # =============================
-        self.camera.background_color = "#0f1116"
 
         # Move to corner and become small
 
