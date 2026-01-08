@@ -18,6 +18,7 @@ class Demonstration(BaseSection):
             .scale_to_fit_height(5.5)
             .to_edge(DOWN)
         )
+        self.add(video)
         self.wait_until(lambda: video.finished)
         self.play(FadeOut(video))
 
