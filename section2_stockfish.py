@@ -14,8 +14,6 @@ import numpy as np
 
 class StockfishExplainer(Scene):
     def construct(self):
-        self.camera.background_color = "#0f1116"
-
         # -----------------------------
         # Z-LAYERS
         # -----------------------------
@@ -33,10 +31,16 @@ class StockfishExplainer(Scene):
         logo.scale(0.001).move_to(ORIGIN)
 
         self.play(FadeIn(logo, scale=1.05), run_time=0.15)
-        self.play(logo.animate.scale(900), rate_func=rate_functions.ease_out_back, run_time=0.9)
+        self.play(
+            logo.animate.scale(900),
+            rate_func=rate_functions.ease_out_back,
+            run_time=0.9,
+        )
 
         logo_target = logo.copy()
-        logo_target.scale(0.18).to_corner(UR, buff=0.25).shift(DOWN * 0.05).shift(LEFT * 0.05)
+        logo_target.scale(0.18).to_corner(UR, buff=0.25).shift(DOWN * 0.05).shift(
+            LEFT * 0.05
+        )
 
         # Faster move-to-corner transform (grow is fine; move is faster)
         self.play(
@@ -104,7 +108,7 @@ class StockfishExplainer(Scene):
 
                 per_sq = [e_top, e_right, e_bottom, e_left]
                 micro = [0.00, 0.015, 0.030, 0.045]  # a touch more spacing
-                base = 0.065 * (f + r)              # slower ripple across the board (was 0.04)
+                base = 0.065 * (f + r)  # slower ripple across the board (was 0.04)
 
                 for e, m in zip(per_sq, micro):
                     # Blue sweep (was white)
@@ -137,18 +141,22 @@ class StockfishExplainer(Scene):
                     else:
                         op = 0.0
                 mobj.set_stroke(opacity=op)
+
             return UpdateFromAlphaFunc(edge, updater)
 
         # Slower overall sweep, hardcoded!
         sweep_window = 1.5
-        sweep_anims = [edge_pulse_anim(e, d, total_window=sweep_window) for e, d in zip(edges, delays)]
+        sweep_anims = [
+            edge_pulse_anim(e, d, total_window=sweep_window)
+            for e, d in zip(edges, delays)
+        ]
         self.play(AnimationGroup(*sweep_anims, lag_ratio=0.0), run_time=sweep_window)
 
         # After sweep completes, draw arrow
         arrow_y = board_svg.get_center()[1]
         board_to_bar = Arrow(
             start=board_svg.get_right() + RIGHT * 0.15,
-            end=RIGHT * 1.10 + UP * arrow_y,   # just a horizontal target point
+            end=RIGHT * 1.10 + UP * arrow_y,  # just a horizontal target point
             buff=0.0,
             stroke_width=4,
             max_tip_length_to_length_ratio=0.14,
@@ -156,7 +164,6 @@ class StockfishExplainer(Scene):
         board_to_bar.set_stroke(WHITE, opacity=0.65)
         board_to_bar.set_z_index(Z_UI)
         self.play(Create(board_to_bar), run_time=0.28)
-
 
         # ---- Eval bar (centipawn-like in pawns)
         # We'll show -2.0 ... 0.0 ... +2.0 (pawns).
@@ -168,9 +175,16 @@ class StockfishExplainer(Scene):
         bar_right = RIGHT * 6.05 + UP * bar_y
 
         bar_line = Line(bar_left, bar_right).set_stroke(WHITE, 4, opacity=0.75)
-        tickL = Line(bar_left + UP * 0.12, bar_left + DOWN * 0.12).set_stroke(WHITE, 3, opacity=0.75)
-        tickM = Line((bar_left + bar_right) / 2 + UP * 0.12, (bar_left + bar_right) / 2 + DOWN * 0.12).set_stroke(WHITE, 3, opacity=0.75)
-        tickR = Line(bar_right + UP * 0.12, bar_right + DOWN * 0.12).set_stroke(WHITE, 3, opacity=0.75)
+        tickL = Line(bar_left + UP * 0.12, bar_left + DOWN * 0.12).set_stroke(
+            WHITE, 3, opacity=0.75
+        )
+        tickM = Line(
+            (bar_left + bar_right) / 2 + UP * 0.12,
+            (bar_left + bar_right) / 2 + DOWN * 0.12,
+        ).set_stroke(WHITE, 3, opacity=0.75)
+        tickR = Line(bar_right + UP * 0.12, bar_right + DOWN * 0.12).set_stroke(
+            WHITE, 3, opacity=0.75
+        )
 
         labelL = Text("-2.0", font_size=20, color=WHITE).next_to(tickL, DOWN, buff=0.12)
         labelM = Text("0.0", font_size=20, color=WHITE).next_to(tickM, DOWN, buff=0.12)
@@ -181,7 +195,9 @@ class StockfishExplainer(Scene):
         eval_value = Text("?", font_size=26, color=WHITE)
 
         # Increase spacing so "+" never collides with the colon
-        eval_group = VGroup(eval_label, eval_value).arrange(RIGHT, buff=0.32)  # was 0.18
+        eval_group = VGroup(eval_label, eval_value).arrange(
+            RIGHT, buff=0.32
+        )  # was 0.18
         eval_group.next_to(bar_line, UP, buff=0.22)
         eval_group.set_z_index(Z_UI)
 
@@ -201,13 +217,27 @@ class StockfishExplainer(Scene):
 
         marker.add_updater(lambda m: marker_update(m))
 
-        bar_group.add(bar_line, tickL, tickM, tickR, labelL, labelM, labelR, eval_group, marker)
+        bar_group.add(
+            bar_line, tickL, tickM, tickR, labelL, labelM, labelR, eval_group, marker
+        )
         self.play(FadeIn(bar_group, shift=UP * 0.10), run_time=0.45)
 
         # Marker "searching" while eval is unknown
-        self.play(t_marker.animate.set_value(1.0), run_time=0.55, rate_func=rate_functions.ease_in_out_sine)
-        self.play(t_marker.animate.set_value(0.15), run_time=0.50, rate_func=rate_functions.ease_in_out_sine)
-        self.play(t_marker.animate.set_value(0.80), run_time=0.45, rate_func=rate_functions.ease_in_out_sine)
+        self.play(
+            t_marker.animate.set_value(1.0),
+            run_time=0.55,
+            rate_func=rate_functions.ease_in_out_sine,
+        )
+        self.play(
+            t_marker.animate.set_value(0.15),
+            run_time=0.50,
+            rate_func=rate_functions.ease_in_out_sine,
+        )
+        self.play(
+            t_marker.animate.set_value(0.80),
+            run_time=0.45,
+            rate_func=rate_functions.ease_in_out_sine,
+        )
 
         # Final centipawn-ish evaluation (in pawns, displayed like Stockfish)
         final_eval_pawns = +0.68  # shows as +0.68
@@ -242,14 +272,22 @@ class StockfishExplainer(Scene):
         self.remove(board_copy)
 
         # Marker locks to final value and stops (remove updater properly)
-        self.play(t_marker.animate.set_value(final_t), run_time=0.45, rate_func=rate_functions.ease_in_out_cubic)
+        self.play(
+            t_marker.animate.set_value(final_t),
+            run_time=0.45,
+            rate_func=rate_functions.ease_in_out_cubic,
+        )
         marker.clear_updaters()
 
         # Slight pause to read it
         self.wait(0.3)
 
         # Dim bar a touch to transition; keep original board visible
-        self.play(bar_group.animate.set_opacity(0.85), board_to_bar.animate.set_opacity(0.85), run_time=0.20)
+        self.play(
+            bar_group.animate.set_opacity(0.85),
+            board_to_bar.animate.set_opacity(0.85),
+            run_time=0.20,
+        )
 
         # =============================
         # 3) SEARCH TREE (centipawns in pawns, + green / - red)
@@ -306,9 +344,9 @@ class StockfishExplainer(Scene):
         x_l3 = [-3.35, -2.25, -1.55, -0.45, 0.45, 1.55, 2.25, 3.35]
 
         root = node(0.26).move_to([x_root, Y0, 0])
-        l1 = [node().move_to([x, Y1, 0]) for x in x_l1]       # MIN
-        l2 = [node().move_to([x, Y2, 0]) for x in x_l2]       # MAX
-        l3 = [node(0.20).move_to([x, Y3, 0]) for x in x_l3]   # leaves
+        l1 = [node().move_to([x, Y1, 0]) for x in x_l1]  # MIN
+        l2 = [node().move_to([x, Y2, 0]) for x in x_l2]  # MAX
+        l3 = [node(0.20).move_to([x, Y3, 0]) for x in x_l3]  # leaves
 
         tree.add(root, *l1, *l2, *l3)
 
@@ -331,38 +369,64 @@ class StockfishExplainer(Scene):
         e_B2_L2 = connect(l2[3], l3[7])
 
         edges_all = [
-            e_root_A, e_root_B,
-            e_A_A1, e_A_A2, e_B_B1, e_B_B2,
-            e_A1_L1, e_A1_L2, e_A2_L1, e_A2_L2,
-            e_B1_L1, e_B1_L2, e_B2_L1, e_B2_L2
+            e_root_A,
+            e_root_B,
+            e_A_A1,
+            e_A_A2,
+            e_B_B1,
+            e_B_B2,
+            e_A1_L1,
+            e_A1_L2,
+            e_A2_L1,
+            e_A2_L2,
+            e_B1_L1,
+            e_B1_L2,
+            e_B2_L1,
+            e_B2_L2,
         ]
         tree.add(*edges_all)
 
         self.play(FadeIn(tree, shift=UP * 0.12), run_time=0.60)
 
         # Alpha/Beta HUD near root (in pawns)
-        alpha_hud = tag_text("α = -inf", size=18, color=YELLOW).next_to(root, LEFT, buff=0.55).shift(UP * 0.12)
-        beta_hud = tag_text("β = +inf", size=18, color=BLUE_B).next_to(root, RIGHT, buff=0.55).shift(UP * 0.12)
+        alpha_hud = (
+            tag_text("α = -inf", size=18, color=YELLOW)
+            .next_to(root, LEFT, buff=0.55)
+            .shift(UP * 0.12)
+        )
+        beta_hud = (
+            tag_text("β = +inf", size=18, color=BLUE_B)
+            .next_to(root, RIGHT, buff=0.55)
+            .shift(UP * 0.12)
+        )
         self.play(FadeIn(alpha_hud), FadeIn(beta_hud), run_time=0.25)
 
         def visit(node_obj, edge_obj=None, rt=0.22):
             anims = [node_obj.animate.set_fill("#2a3347", opacity=1.0)]
             if edge_obj is not None:
-                anims.append(edge_obj.animate.set_stroke(color=YELLOW, width=4, opacity=0.95))
+                anims.append(
+                    edge_obj.animate.set_stroke(color=YELLOW, width=4, opacity=0.95)
+                )
             return AnimationGroup(*anims, run_time=rt, lag_ratio=0.0)
 
         def unvisit(node_obj, edge_obj=None, rt=0.15):
             anims = [node_obj.animate.set_fill("#1b2230", opacity=1.0)]
             if edge_obj is not None:
-                anims.append(edge_obj.animate.set_stroke(color=WHITE, width=2, opacity=0.55))
+                anims.append(
+                    edge_obj.animate.set_stroke(color=WHITE, width=2, opacity=0.55)
+                )
             return AnimationGroup(*anims, run_time=rt, lag_ratio=0.0)
 
         # Leaf values (pawns), chosen to force prune clearly
         leaf_v = [
-            +0.78, +0.62,   # A1 -> MAX = +0.78
-            +0.68, +0.55,   # A2 -> MAX = +0.68 => A(MIN)=+0.68 => alpha=+0.68
-            +0.40, +0.30,   # B1 -> MAX = +0.40 => beta=+0.40 <= alpha => prune B2
-            +0.10, -0.20,   # B2 (pruned)
+            +0.78,
+            +0.62,  # A1 -> MAX = +0.78
+            +0.68,
+            +0.55,  # A2 -> MAX = +0.68 => A(MIN)=+0.68 => alpha=+0.68
+            +0.40,
+            +0.30,  # B1 -> MAX = +0.40 => beta=+0.40 <= alpha => prune B2
+            +0.10,
+            -0.20,  # B2 (pruned)
         ]
 
         leaf_texts = [None] * 8
@@ -402,7 +466,10 @@ class StockfishExplainer(Scene):
         self.play(TransformFromCopy(A2_val, A_val), run_time=0.24)
 
         # Update alpha
-        self.play(Transform(alpha_hud, tag_text("α = +0.68", 18, YELLOW).move_to(alpha_hud)), run_time=0.20)
+        self.play(
+            Transform(alpha_hud, tag_text("α = +0.68", 18, YELLOW).move_to(alpha_hud)),
+            run_time=0.20,
+        )
         self.play(unvisit(l1[0], e_root_A), run_time=0.13)
 
         # ROOT -> B
@@ -418,10 +485,16 @@ class StockfishExplainer(Scene):
         self.play(TransformFromCopy(leaf_texts[4], B1_val), run_time=0.22)
         self.play(unvisit(l2[2], e_B_B1), run_time=0.13)
 
-        beta_at_B = tag_text("β = +0.40", size=18, color=BLUE_B).next_to(l1[1], RIGHT, buff=0.35).shift(UP * 0.08)
+        beta_at_B = (
+            tag_text("β = +0.40", size=18, color=BLUE_B)
+            .next_to(l1[1], RIGHT, buff=0.35)
+            .shift(UP * 0.08)
+        )
         self.play(FadeIn(beta_at_B, shift=UP * 0.06), run_time=0.18)
 
-        prune_tag = tag_text("β ≤ α  →  prune", size=18, color=RED_B).next_to(l2[3], UP, buff=0.22)
+        prune_tag = tag_text("β ≤ α  →  prune", size=18, color=RED_B).next_to(
+            l2[3], UP, buff=0.22
+        )
 
         def red_x_over(mobj, scale=0.55):
             c = mobj.get_center()
