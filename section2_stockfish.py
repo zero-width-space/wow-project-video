@@ -1,11 +1,7 @@
-# stockfish_explainer.py
-# Manim Community Edition
-#
 # pip install manim python-chess svglib
 #
 # Render:
-# manim -pqh stockfish_explainer.py StockfishExplainer
-# manim -p -qh stockfish_explainer.py StockfishExplainer
+# manim -pql stockfish_explainer.py StockfishExplainer
 
 from manim import *
 import chess
@@ -41,7 +37,13 @@ class StockfishExplainer(Scene):
 
         logo_target = logo.copy()
         logo_target.scale(0.18).to_corner(UR, buff=0.25).shift(DOWN * 0.05).shift(LEFT * 0.05)
-        self.play(Transform(logo, logo_target), run_time=0.95, rate_func=rate_functions.ease_in_out_cubic)
+
+        # Faster move-to-corner transform (grow is fine; move is faster)
+        self.play(
+            Transform(logo, logo_target),
+            run_time=0.55,  # was 0.95
+            rate_func=rate_functions.ease_in_out_cubic,
+        )
 
         # =============================
         # 2) CHESS BOARD (SVG) + FEATURE SWEEP + EVAL BAR
@@ -58,9 +60,15 @@ class StockfishExplainer(Scene):
         board_svg = SVGMobject(str(svg_path))
         board_svg.set_z_index(Z_BOARD)
         board_svg.scale_to_fit_height(4.95)
-        board_svg.to_edge(LEFT, buff=0.55).shift(DOWN * 0.25)
+
+        # Place on the left, but vertically CENTER the board in the frame
+        board_svg.to_edge(LEFT, buff=0.55)
+        board_svg.move_to([board_svg.get_center()[0], 0.0, 0.0])  # center Y = 0
 
         self.play(FadeIn(board_svg, shift=RIGHT * 0.15), run_time=0.65)
+
+        # Longer pause to look at the board before the "taking in" grid sweep
+        self.wait(0.85)  # increased
 
         # ---- Overlay grid edges ABOVE board
         overlay = VGroup().set_z_index(Z_OVERLAY)
@@ -95,11 +103,12 @@ class StockfishExplainer(Scene):
                 e_left = Line(tl, bl)
 
                 per_sq = [e_top, e_right, e_bottom, e_left]
-                micro = [0.00, 0.012, 0.024, 0.036]
-                base = 0.04 * (f + r)
+                micro = [0.00, 0.015, 0.030, 0.045]  # a touch more spacing
+                base = 0.065 * (f + r)              # slower ripple across the board (was 0.04)
 
                 for e, m in zip(per_sq, micro):
-                    e.set_stroke(WHITE, width=3, opacity=0.0)
+                    # Blue sweep (was white)
+                    e.set_stroke(BLUE_B, width=3, opacity=0.0)
                     e.set_z_index(Z_OVERLAY)
                     edges.append(e)
                     delays.append(base + m)
@@ -121,7 +130,8 @@ class StockfishExplainer(Scene):
                 if t < start_delay:
                     op = 0.0
                 else:
-                    local = (t - start_delay) / 0.3  # pulse length
+                    # slightly longer pulse (was 0.3)
+                    local = (t - start_delay) / 0.38
                     if 0 <= local <= 1:
                         op = 0.85 * pulse_opacity(local)
                     else:
@@ -129,16 +139,22 @@ class StockfishExplainer(Scene):
                 mobj.set_stroke(opacity=op)
             return UpdateFromAlphaFunc(edge, updater)
 
-        sweep_window = 2.5
+        # Slower overall sweep
+        sweep_window = 3.35  # was 2.5
         sweep_anims = [edge_pulse_anim(e, d, total_window=sweep_window) for e, d in zip(edges, delays)]
         self.play(AnimationGroup(*sweep_anims, lag_ratio=0.0), run_time=sweep_window)
+
+        # 0.2s after sweep completes, draw arrow, THEN evaluation sequence begins
+        self.wait(0.2)
 
         # ---- Eval bar (centipawn-like in pawns)
         # We'll show -2.0 ... 0.0 ... +2.0 (pawns).
         bar_group = VGroup().set_z_index(Z_UI)
 
-        bar_left = RIGHT * 1.15 + UP * 0.35
-        bar_right = RIGHT * 6.05 + UP * 0.35
+        # Align bar vertically with board center so arrow can be horizontal
+        bar_y = board_svg.get_center()[1]  # should be 0.0 now
+        bar_left = RIGHT * 1.15 + UP * bar_y
+        bar_right = RIGHT * 6.05 + UP * bar_y
 
         bar_line = Line(bar_left, bar_right).set_stroke(WHITE, 4, opacity=0.75)
         tickL = Line(bar_left + UP * 0.12, bar_left + DOWN * 0.12).set_stroke(WHITE, 3, opacity=0.75)
@@ -153,7 +169,8 @@ class StockfishExplainer(Scene):
         eval_label = Text("Evaluation:", font_size=26, color=WHITE)
         eval_value = Text("?", font_size=26, color=WHITE)
 
-        eval_group = VGroup(eval_label, eval_value).arrange(RIGHT, buff=0.18)
+        # Increase spacing so "+" never collides with the colon
+        eval_group = VGroup(eval_label, eval_value).arrange(RIGHT, buff=0.32)  # was 0.18
         eval_group.next_to(bar_line, UP, buff=0.22)
         eval_group.set_z_index(Z_UI)
 
@@ -173,7 +190,10 @@ class StockfishExplainer(Scene):
 
         marker.add_updater(lambda m: marker_update(m))
 
-        # Arrow pointing from board to the bar (board -> bar, subtle)
+        bar_group.add(bar_line, tickL, tickM, tickR, labelL, labelM, labelR, eval_group, marker)
+        self.play(FadeIn(bar_group, shift=UP * 0.10), run_time=0.45)
+
+        # Arrow pointing from board to the bar (board -> bar), should now be horizontal
         board_to_bar = Arrow(
             start=board_svg.get_right() + RIGHT * 0.15,
             end=bar_left + LEFT * 0.10,
@@ -184,8 +204,8 @@ class StockfishExplainer(Scene):
         board_to_bar.set_stroke(WHITE, opacity=0.65)
         board_to_bar.set_z_index(Z_UI)
 
-        bar_group.add(bar_line, tickL, tickM, tickR, labelL, labelM, labelR, eval_group, marker, board_to_bar)
-        self.play(FadeIn(bar_group, shift=UP * 0.10), run_time=0.45)
+        # Draw (Create) if possible; otherwise it'll still look like a drawn reveal
+        self.play(Create(board_to_bar), run_time=0.28)
 
         # Marker "searching" while eval is unknown
         self.play(t_marker.animate.set_value(1.0), run_time=0.55, rate_func=rate_functions.ease_in_out_sine)
@@ -232,7 +252,7 @@ class StockfishExplainer(Scene):
         self.wait(0.3)
 
         # Dim bar a touch to transition; keep original board visible
-        self.play(bar_group.animate.set_opacity(0.85), run_time=0.20)
+        self.play(bar_group.animate.set_opacity(0.85), board_to_bar.animate.set_opacity(0.85), run_time=0.20)
 
         # =============================
         # 3) SEARCH TREE (centipawns in pawns, + green / - red)
