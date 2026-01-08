@@ -5,20 +5,20 @@ from manim import *
 
 class OurModel(BaseSection):
     def construct(self):
-        self.show_section_title("Our model", "Training process and results")
+        self.show_section_title("Our AI model")
 
         top_text = Paragraph(
-            "Due to time constraints, we cannot create a model large enough",
-            "for self-play to be effective",
+            "Due to time and resource constraints, we cannot generate and train on",
+            "self-play games for reinforcement learning.",
             font_size=30,
         ).to_edge(UP)
 
         self.play(Write(top_text))
-        self.wait()
+        self.wait(5)
 
         new_text = Paragraph(
-            "Therefore, we decided to use distillation, where we train a",
-            "weaker model using data from a stronger model",
+            "Therefore, we use distillation, where we train a",
+            "weaker model using data from a stronger model.",
             font_size=30,
         ).to_edge(UP)
         self.play(Transform(top_text, new_text))

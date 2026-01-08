@@ -38,5 +38,5 @@ class ChessIntro(BaseSection):
         video = VideoMobject("stockfish.mp4").scale_to_fit_height(5).to_edge(DOWN)
         self.add(video)
         self.play(Write(text))
-        self.wait(6)
+        self.wait(7.5)
         self.fade_out()

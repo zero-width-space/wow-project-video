@@ -1,4 +1,0 @@
-
-
-
-This is simplified version of negamax (minimax variant)
