@@ -38,9 +38,10 @@ class EngineIntro(BaseSection):
             LEFT * 0.05
         )
 
+        # Faster move-to-corner transform (grow is fine; move is faster)
         self.play(
             Transform(logo, logo_target),
-            run_time=0.55,
+            run_time=0.55,  # was 0.95
             rate_func=rate_functions.ease_in_out_cubic,
         )
 
@@ -60,11 +61,13 @@ class EngineIntro(BaseSection):
         board_svg.set_z_index(Z_BOARD)
         board_svg.scale_to_fit_height(4.95)
 
-        # Place on the left, vertically centered
+        # Place on the left, but vertically CENTER the board in the frame
         board_svg.to_edge(LEFT, buff=0.55)
-        board_svg.move_to([board_svg.get_center()[0], 0.0, 0.0])
+        board_svg.move_to([board_svg.get_center()[0], 0.0, 0.0])  # center Y = 0
 
         self.play(FadeIn(board_svg, shift=RIGHT * 0.15), run_time=0.65)
+
+        # Pause to look at the board before the "taking in" grid sweep
         self.wait(1.1)
 
         # ---- Overlay grid edges ABOVE board
@@ -100,10 +103,11 @@ class EngineIntro(BaseSection):
                 e_left = Line(tl, bl)
 
                 per_sq = [e_top, e_right, e_bottom, e_left]
-                micro = [0.00, 0.015, 0.030, 0.045]
-                base = 0.065 * (f + r)
+                micro = [0.00, 0.015, 0.030, 0.045]  # a touch more spacing
+                base = 0.065 * (f + r)  # slower ripple across the board (was 0.04)
 
                 for e, m in zip(per_sq, micro):
+                    # Blue sweep (was white)
                     e.set_stroke(BLUE_B, width=3, opacity=0.0)
                     e.set_z_index(Z_OVERLAY)
                     edges.append(e)
@@ -113,6 +117,7 @@ class EngineIntro(BaseSection):
         self.add(overlay)
 
         def pulse_opacity(alpha):
+            # 0->0.25 fade in, 0.25->0.55 hold, 0.55->1 fade out
             if alpha < 0.25:
                 return smooth(alpha / 0.25)
             if alpha < 0.55:
@@ -125,6 +130,7 @@ class EngineIntro(BaseSection):
                 if t < start_delay:
                     op = 0.0
                 else:
+                    # slightly longer pulse (was 0.3)
                     local = (t - start_delay) / 0.38
                     if 0 <= local <= 1:
                         op = 0.85 * pulse_opacity(local)
@@ -134,6 +140,7 @@ class EngineIntro(BaseSection):
 
             return UpdateFromAlphaFunc(edge, updater)
 
+        # Slower overall sweep, hardcoded!
         sweep_window = 1.5
         sweep_anims = [
             edge_pulse_anim(e, d, total_window=sweep_window)
@@ -145,7 +152,7 @@ class EngineIntro(BaseSection):
         arrow_y = board_svg.get_center()[1]
         board_to_bar = Arrow(
             start=board_svg.get_right() + RIGHT * 0.15,
-            end=RIGHT * 1.10 + UP * arrow_y,
+            end=RIGHT * 1.10 + UP * arrow_y,  # just a horizontal target point
             buff=0.0,
             stroke_width=4,
             max_tip_length_to_length_ratio=0.14,
@@ -154,10 +161,12 @@ class EngineIntro(BaseSection):
         board_to_bar.set_z_index(Z_UI)
         self.play(Create(board_to_bar), run_time=0.28)
 
-        # ---- Eval bar
+        # ---- Eval bar (centipawn-like in pawns)
+        # We'll show -2.0 ... 0.0 ... +2.0 (pawns).
         bar_group = VGroup().set_z_index(Z_UI)
 
-        bar_y = board_svg.get_center()[1]
+        # Align bar vertically with board center so arrow can be horizontal
+        bar_y = board_svg.get_center()[1]  # should be 0.0 now
         bar_left = RIGHT * 1.15 + UP * bar_y
         bar_right = RIGHT * 6.05 + UP * bar_y
 
@@ -177,30 +186,42 @@ class EngineIntro(BaseSection):
         labelM = Text("0.0", font_size=20, color=WHITE).next_to(tickM, DOWN, buff=0.12)
         labelR = Text("+5.0", font_size=20, color=WHITE).next_to(tickR, DOWN, buff=0.12)
 
+        # "Evaluation: ?" as stable label + dynamic value (only value transforms)
         eval_label = Text("Evaluation:", font_size=26, color=WHITE)
         eval_value = Text("?", font_size=26, color=WHITE)
 
-        eval_group = VGroup(eval_label, eval_value).arrange(RIGHT, buff=0.32)
+        # Increase spacing so "+" never collides with the colon
+        eval_group = VGroup(eval_label, eval_value).arrange(
+            RIGHT, buff=0.32
+        )  # was 0.18
         eval_group.next_to(bar_line, UP, buff=0.22)
         eval_group.set_z_index(Z_UI)
 
+        # Up-pointing marker (triangle points up by default)
         marker = Triangle().scale(0.12)
         marker.set_fill(WHITE, opacity=0.95)
         marker.set_stroke(width=0)
 
+        # Marker tracks along the bar (value -2..+2 mapped to 0..1)
         t_marker = ValueTracker(0.0)
 
         def marker_pos_from_t(t):
             return interpolate(bar_left, bar_right, t) + DOWN * 0.1
 
-        marker.add_updater(lambda m: m.move_to(marker_pos_from_t(t_marker.get_value())))
+        def marker_update(m):
+            m.move_to(marker_pos_from_t(t_marker.get_value()))
+
+        def marker_update_lambda(m):
+            marker_update(m)
+
+        marker.add_updater(lambda m: marker_update(m))
 
         bar_group.add(
             bar_line, tickL, tickM, tickR, labelL, labelM, labelR, eval_group, marker
         )
         self.play(FadeIn(bar_group, shift=UP * 0.10), run_time=0.45)
 
-        # Marker "searching"
+        # Marker "searching" while eval is unknown
         self.play(
             t_marker.animate.set_value(1.0),
             run_time=0.55,
@@ -217,21 +238,28 @@ class EngineIntro(BaseSection):
             rate_func=rate_functions.ease_in_out_sine,
         )
 
-        final_eval_pawns = +0.68
+        # Final centipawn-ish evaluation (in pawns, displayed like Stockfish)
+        final_eval_pawns = +0.68  # shows as +0.68
+        # Map [-2..+2] -> [0..1]
         BAR_MIN, BAR_MAX = -2.0, 2.0
         final_t = (final_eval_pawns - BAR_MIN) / (BAR_MAX - BAR_MIN)
         final_t = max(0.0, min(1.0, final_t))
 
+        # Create the final value text in-place (same position), with proper color
         eval_str = f"{final_eval_pawns:+.2f}"
         eval_color = GREEN_B if final_eval_pawns >= 0 else RED_B
         eval_value_target = Text(eval_str, font_size=26, color=eval_color)
         eval_value_target.move_to(eval_value.get_center())
         eval_value_target.set_z_index(Z_UI)
 
+        # Copy of the board transforms while moving INTO the value area.
         board_copy = board_svg.copy()
-        board_copy.set_z_index(Z_UI)
+        board_copy.set_z_index(Z_UI)  # above everything during transform
         self.add(board_copy)
 
+        # Fade overlay out (scan done)
+        # Transform board_copy -> eval_value_target WHILE MOVING (one transform)
+        # Also transform eval_value ("?") -> "+0.41" in the same spot.
         self.play(
             FadeOut(overlay),
             Transform(eval_value, eval_value_target),
@@ -239,8 +267,10 @@ class EngineIntro(BaseSection):
             run_time=0.75,
             rate_func=rate_functions.ease_in_out_cubic,
         )
+        # Clean: remove the board_copy remnants if any (it has been transformed into text-like geometry)
         self.remove(board_copy)
 
+        # Marker locks to final value and stops (remove updater properly)
         self.play(
             t_marker.animate.set_value(final_t),
             run_time=0.45,
@@ -248,8 +278,10 @@ class EngineIntro(BaseSection):
         )
         marker.clear_updaters()
 
+        # Slight pause to read it
         self.wait(0.3)
 
+        # Dim bar a touch to transition; keep original board visible
         self.play(
             bar_group.animate.set_opacity(0.85),
             board_to_bar.animate.set_opacity(0.85),
@@ -257,8 +289,11 @@ class EngineIntro(BaseSection):
         )
 
         # =============================
-        # 3) SEARCH TREE (DFS + ALPHA-BETA PRUNING)
+        # 3) SEARCH TREE (centipawns in pawns, + green / - red)
+        # DFS + CLEAR ALPHA-BETA PRUNING (same structure as before)
         # =============================
+
+        # --- Tree layers
         Z_EDGE = 2
         Z_NODE = 6
         Z_TEXT = Z_TREE_TEXT
@@ -281,6 +316,7 @@ class EngineIntro(BaseSection):
             return n.get_center() + UP * dy
 
         def cp_text(x, size=22):
+            # x in pawns, show + / - and color
             s = f"{x:+.2f}"
             col = GREEN_B if x >= 0 else RED_B
             t = Text(s, font_size=size, color=col)
@@ -295,6 +331,7 @@ class EngineIntro(BaseSection):
         tree = VGroup().set_z_index(3)
         tree.shift(RIGHT * 3.05 + DOWN * 0.55)
 
+        # Layout
         Y0 = 2.35
         Y1 = 1.10
         Y2 = -0.15
@@ -350,6 +387,7 @@ class EngineIntro(BaseSection):
 
         self.play(FadeIn(tree, shift=UP * 0.12), run_time=0.60)
 
+        # Alpha/Beta HUD near root (in pawns)
         alpha_hud = (
             tag_text("α = -inf", size=18, color=YELLOW)
             .next_to(root, LEFT, buff=0.55)
@@ -378,15 +416,16 @@ class EngineIntro(BaseSection):
                 )
             return AnimationGroup(*anims, run_time=rt, lag_ratio=0.0)
 
+        # Leaf values (pawns), chosen to force prune clearly
         leaf_v = [
             +0.78,
-            +0.62,
+            +0.62,  # A1 -> MAX = +0.78
             +0.68,
-            +0.55,
+            +0.55,  # A2 -> MAX = +0.68 => A(MIN)=+0.68 => alpha=+0.68
             +0.40,
-            +0.30,
+            +0.30,  # B1 -> MAX = +0.40 => beta=+0.40 <= alpha => prune B2
             +0.10,
-            -0.20,
+            -0.20,  # B2 (pruned)
         ]
 
         leaf_texts = [None] * 8
@@ -425,7 +464,7 @@ class EngineIntro(BaseSection):
         A_val = cp_text(+0.78, size=24).move_to(val_above(l1[0], 0.34))
         self.play(TransformFromCopy(A2_val, A_val), run_time=0.24)
 
-        # Update alpha (kept exactly like your reference, even though the number differs from A_val)
+        # Update alpha
         self.play(
             Transform(alpha_hud, tag_text("α = +0.68", 18, YELLOW).move_to(alpha_hud)),
             run_time=0.20,
@@ -440,6 +479,7 @@ class EngineIntro(BaseSection):
         show_leaf(4, l3[4], e_B1_L1)
         show_leaf(5, l3[5], e_B1_L2)
 
+        # B1 (MAX) = +0.40  (shown BEFORE B)
         B1_val = cp_text(+0.40, size=22).move_to(val_above(l2[2], 0.32))
         self.play(TransformFromCopy(leaf_texts[4], B1_val), run_time=0.22)
         self.play(unvisit(l2[2], e_B_B1), run_time=0.13)
@@ -505,21 +545,7 @@ class EngineIntro(BaseSection):
 
         self.wait(0.9)
 
-        # Clean end: fade Stockfish-specific visuals (optional but usually helps the next section)
-        self.play(
-            FadeOut(tree),
-            FadeOut(alpha_hud),
-            FadeOut(beta_hud),
-            FadeOut(beta_at_B),
-            FadeOut(prune_tag),
-            FadeOut(Xb2),
-            FadeOut(root_val),
-            FadeOut(bar_group),
-            FadeOut(board_to_bar),
-            FadeOut(board_svg),
-            FadeOut(logo),
-            run_time=0.6,
-        )
+
 
     def show_alphazero_flowchart(self):
         # A clearer AlphaZero loop:
@@ -711,10 +737,6 @@ class EngineIntro(BaseSection):
         self.wait(2)
 
     def construct(self):
-        self.show_section_title(
-            "Introduction to chess engines", "A more detailed overview"
-        )
-
         top_text = Paragraph(
             "There are 2 main types of chess engines", font_size=30
         ).to_edge(UP)
