@@ -89,7 +89,7 @@ class OurModel(BaseSection):
                 "numbers_with_elongated_ticks": np.arange(0, 1200001, 100000),
                 "label_direction": DOWN,
             },
-            y_axis_config={"numbers_to_include": np.arange(2, 5.01, 0.5)},
+            y_axis_config={"numbers_to_include": np.arange(1, 5.01, 0.5)},
         ).next_to(top_text, DOWN, buff=0.5)
 
         _, smooth_data = get_data()
