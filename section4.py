@@ -219,8 +219,7 @@ class ChessTransformer(Scene):
         # 0) Hook: Search tree vs one forward pass
         # ------------------------------------------------------------
         t0 = title("A chess engine without search")
-        s0 = subtitle("Distill strong engine evaluations into a transformer")
-        self.play(Write(t0), FadeIn(s0, shift=DOWN), run_time=T["reveal"])
+        self.play(Write(t0), run_time=T["reveal"])
 
         board = chessboard(2.9).move_to(LEFT * 4.2 + DOWN * 0.2)
 
@@ -293,7 +292,6 @@ class ChessTransformer(Scene):
             FadeOut(xmark),
             FadeOut(net),
             FadeOut(net_label),
-            FadeOut(s0),
             run_time=T["fade"],
         )
 

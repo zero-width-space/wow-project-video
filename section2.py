@@ -248,7 +248,7 @@ class EngineIntro(BaseSection):
         # Create the final value text in-place (same position), with proper color
         eval_str = f"{final_eval_pawns:+.2f}"
         eval_color = GREEN_B if final_eval_pawns >= 0 else RED_B
-        eval_value_target = Text(eval_str, font_size=26, color=eval_color)
+        eval_value_target = Text(eval_str, font_size=26, color=eval_color).shift(RIGHT*0.08)
         eval_value_target.move_to(eval_value.get_center())
         eval_value_target.set_z_index(Z_UI)
 
@@ -385,6 +385,15 @@ class EngineIntro(BaseSection):
         ]
         tree.add(*edges_all)
 
+
+        # --- Remove board + eval UI before showing the tree
+        self.play(
+            FadeOut(board_svg, shift=LEFT * 0.10),
+            FadeOut(bar_group, shift=DOWN * 0.06),
+            FadeOut(board_to_bar, shift=DOWN * 0.06),
+            run_time=0.35,
+        )
+
         self.play(FadeIn(tree, shift=UP * 0.12), run_time=0.60)
 
         # Alpha/Beta HUD near root (in pawns)
@@ -400,7 +409,8 @@ class EngineIntro(BaseSection):
         )
         self.play(FadeIn(alpha_hud), FadeIn(beta_hud), run_time=0.25)
 
-        def visit(node_obj, edge_obj=None, rt=0.22):
+        TREE_SLOW = 2  # >1.0 = slower tree pacing
+        def visit(node_obj, edge_obj=None, rt=0.22*TREE_SLOW):
             anims = [node_obj.animate.set_fill("#2a3347", opacity=1.0)]
             if edge_obj is not None:
                 anims.append(
@@ -408,7 +418,7 @@ class EngineIntro(BaseSection):
                 )
             return AnimationGroup(*anims, run_time=rt, lag_ratio=0.0)
 
-        def unvisit(node_obj, edge_obj=None, rt=0.15):
+        def unvisit(node_obj, edge_obj=None, rt=0.15*TREE_SLOW):
             anims = [node_obj.animate.set_fill("#1b2230", opacity=1.0)]
             if edge_obj is not None:
                 anims.append(
@@ -431,11 +441,12 @@ class EngineIntro(BaseSection):
         leaf_texts = [None] * 8
 
         def show_leaf(i, node_leaf, edge_to_leaf):
-            self.play(visit(node_leaf, edge_to_leaf), run_time=0.20)
-            t = cp_text(leaf_v[i], size=20).move_to(val_above(node_leaf, 0.26))
+            self.play(visit(node_leaf, edge_to_leaf), run_time=0.20 * TREE_SLOW)
+            t = cp_text(leaf_v[i], size=20).move_to(node_leaf.get_center())
             leaf_texts[i] = t
-            self.play(FadeIn(t, shift=UP * 0.08), run_time=0.16)
-            self.play(unvisit(node_leaf, edge_to_leaf), run_time=0.11)
+            self.play(FadeIn(t, scale=1.02), run_time=0.18 * TREE_SLOW)
+            self.play(unvisit(node_leaf, edge_to_leaf), run_time=0.11 * TREE_SLOW)
+
 
         self.play(visit(root), run_time=0.14)
 
