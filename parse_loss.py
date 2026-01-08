@@ -39,7 +39,7 @@ def smooth_loss(
     return list(zip(smoothed_steps, smoothed))
 
 
-def get_data():
+def get_data_0():
     with open("2080ti_90k_to_300k_no_LRT.txt", "r") as file:
         data = file.read()
     raw_data_0 = parse_training_log(data)
@@ -49,17 +49,27 @@ def get_data():
     r = max(a for a, b in raw_data_0)
     raw_data_1 = [(a + r, b) for a, b in parse_training_log(data)]
 
+    raw_data = raw_data_0 + raw_data_1
+    smooth_data = smooth_loss(raw_data, window_size=50)
+    return raw_data, smooth_data
+
+
+def get_data_1():
     with open("a100_BC.txt", "r") as file:
         data = file.read()
-    r = max(a for a, b in raw_data_1)
-    raw_data_2 = [(a + r, b) for a, b in parse_training_log(data)]
+    raw_data_0 = parse_training_log(data)
 
-    raw_data = raw_data_0 + raw_data_1 + raw_data_2
+    raw_data = raw_data_0
     smooth_data = smooth_loss(raw_data, window_size=50)
     return raw_data, smooth_data
 
 
 if __name__ == "__main__":
-    raw_data, smooth_data = get_data()
+    raw_data, smooth_data = get_data_0()
+    print(min(b for a, b in raw_data), max(b for a, b in raw_data))
+    print(min(a for a, b in raw_data), max(a for a, b in raw_data))
+    print()
+
+    raw_data, smooth_data = get_data_1()
     print(min(b for a, b in raw_data), max(b for a, b in raw_data))
     print(min(a for a, b in raw_data), max(a for a, b in raw_data))
