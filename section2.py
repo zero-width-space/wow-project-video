@@ -885,7 +885,7 @@ class EngineIntro(BaseSection):
         new_text = Paragraph(
             "For more information about this topic, check out the YouTube series",
             "on deep learning by 3Blue1Brown.",
-            "(https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi)"
+            "(https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi)",
             font_size=30,
         ).next_to(top_text, DOWN)
         self.play(Transform(body_text, new_text))
