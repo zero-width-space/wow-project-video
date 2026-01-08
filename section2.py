@@ -805,7 +805,7 @@ class EngineIntro(BaseSection):
         ).next_to(top_text, DOWN)
 
         self.play(Write(body_text))
-        self.wait()
+        self.wait(2)
 
         self.play(FadeOut(body_text))
 
@@ -817,7 +817,7 @@ class EngineIntro(BaseSection):
             font_size=30,
         ).next_to(top_text, DOWN)
         self.play(Write(body_text))
-        self.wait()
+        self.wait(2)
         self.play(FadeOut(body_text))
 
         # Run the replacement animation (logo/board/eval/tree) from the provided code
@@ -831,31 +831,30 @@ class EngineIntro(BaseSection):
         self.wait(0.4)
 
         body_text = Paragraph(
-            "AlphaZero learns by self-play: it plays against itself",
-            "to build intuition for chess.",
-            "The network outputs two things:",
-            "policy = likely moves, value = how good the position is.",
+            "AlphaZero learns by self-play: it plays against itself to build",
+            "intuition for chess.",
+            "The neural network outputs two things: policy, which gives the best",
+            "moves from a certain position, and value, which shows how advantageous",
+            "a position is.",
             font_size=28,
         ).next_to(top_text, DOWN)
         fit_paragraph(body_text)
         self.play(Write(body_text))
-        self.wait(3)
+        self.wait(2)
 
         new_text = Paragraph(
-            "During play, it uses Monte Carlo Tree Search (MCTS):",
-            "simulate a few futures, guided by the network,",
-            "then pick the move that looks best.",
+            "During play, it uses an algorithm known as Monte Carlo Tree Search (MCTS)",
+            "Where it simulates a few possible futures, guided by the network,",
+            "then picks the move that looks best.",
             font_size=28,
         ).next_to(top_text, DOWN)
         fit_paragraph(new_text)
         self.play(Transform(body_text, new_text))
-        self.wait(3)
+        self.wait(2)
 
         new_text = Paragraph(
-            "Training is a loop:",
-            "self-play generates new games,",
-            "then the network is updated to match the search",
-            "and the final game result. Repeat.",
+            "Training is a loop: self-play generates new games, then the network is",
+            "updated with this new data. This repeats as many times as necessary."
             font_size=28,
         ).next_to(top_text, DOWN)
         fit_paragraph(new_text)
@@ -869,9 +868,9 @@ class EngineIntro(BaseSection):
 
         # Transformer bridge (kept: your original section but slightly clearer)
         body_text = Paragraph(
-            "Neural networks often use transformers — the same",
-            "general architecture used in large language models",
-            " — to build strong representations from input tokens.",
+            "Neural networks often use transformers — the same general architecture",
+            "used in large language models — to build strong representations",
+            "from input tokens, allowing it to play well.",
             font_size=30,
         ).next_to(top_text, DOWN)
         self.play(Write(body_text))
@@ -884,7 +883,7 @@ class EngineIntro(BaseSection):
 
         new_text = Paragraph(
             "For more information, check out the YouTube series on deep learning",
-            "by 3Blue1Brown",
+            "by 3Blue1Brown.",
             font_size=30,
         ).next_to(top_text, DOWN)
         self.play(Transform(body_text, new_text))
