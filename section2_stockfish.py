@@ -52,7 +52,7 @@ class StockfishExplainer(Scene):
         # =============================
         # 2) CHESS BOARD (SVG) + FEATURE SWEEP + EVAL BAR
         # =============================
-        fen = "r2q1rk1/pp2bppp/2n1pn2/2bp4/2B5/2N1PN2/PPQ2PPP/R1B2RK1 w - - 0 9"
+        fen = "rnbq1rk1/pp2bppp/4pn2/2p5/2BPP3/2N2N2/PP3PPP/R1BQ1RK1 w - - 0 8"
         board = chess.Board(fen)
 
         svg_text = chess.svg.board(board=board, size=740, coordinates=False)
@@ -186,9 +186,9 @@ class StockfishExplainer(Scene):
             WHITE, 3, opacity=0.75
         )
 
-        labelL = Text("-2.0", font_size=20, color=WHITE).next_to(tickL, DOWN, buff=0.12)
+        labelL = Text("-5.0", font_size=20, color=WHITE).next_to(tickL, DOWN, buff=0.12)
         labelM = Text("0.0", font_size=20, color=WHITE).next_to(tickM, DOWN, buff=0.12)
-        labelR = Text("+2.0", font_size=20, color=WHITE).next_to(tickR, DOWN, buff=0.12)
+        labelR = Text("+5.0", font_size=20, color=WHITE).next_to(tickR, DOWN, buff=0.12)
 
         # "Evaluation: ?" as stable label + dynamic value (only value transforms)
         eval_label = Text("Evaluation:", font_size=26, color=WHITE)
@@ -210,7 +210,7 @@ class StockfishExplainer(Scene):
         t_marker = ValueTracker(0.0)
 
         def marker_pos_from_t(t):
-            return interpolate(bar_left, bar_right, t) + DOWN * 0.18
+            return interpolate(bar_left, bar_right, t) + DOWN * 0.1
 
         def marker_update(m):
             m.move_to(marker_pos_from_t(t_marker.get_value()))
@@ -260,7 +260,7 @@ class StockfishExplainer(Scene):
 
         # Fade overlay out (scan done)
         # Transform board_copy -> eval_value_target WHILE MOVING (one transform)
-        # Also transform eval_value ("?") -> "+0.68" in the same spot.
+        # Also transform eval_value ("?") -> "+0.41" in the same spot.
         self.play(
             FadeOut(overlay),
             Transform(eval_value, eval_value_target),
@@ -457,12 +457,12 @@ class StockfishExplainer(Scene):
         show_leaf(2, l3[2], e_A2_L1)
         show_leaf(3, l3[3], e_A2_L2)
 
-        A2_val = cp_text(+0.68, size=22).move_to(val_above(l2[1], 0.32))
+        A2_val = cp_text(+0.78, size=22).move_to(val_above(l2[1], 0.32))
         self.play(TransformFromCopy(leaf_texts[2], A2_val), run_time=0.22)
         self.play(unvisit(l2[1], e_A_A2), run_time=0.13)
 
-        # A (MIN) = +0.68
-        A_val = cp_text(+0.68, size=24).move_to(val_above(l1[0], 0.34))
+        # A (MIN) = +0.78
+        A_val = cp_text(+0.78, size=24).move_to(val_above(l1[0], 0.34))
         self.play(TransformFromCopy(A2_val, A_val), run_time=0.24)
 
         # Update alpha
@@ -521,8 +521,8 @@ class StockfishExplainer(Scene):
         self.play(TransformFromCopy(B1_val, B_val), run_time=0.24)
         self.play(unvisit(l1[1], e_root_B), run_time=0.13)
 
-        # ROOT (MAX) = +0.68
-        root_val = cp_text(+0.68, size=28)
+        # ROOT (MAX) = +0.78
+        root_val = cp_text(+0.78, size=28)
         root_val.set_color(YELLOW)
         root_val.move_to(val_above(root, 0.38))
         self.play(FadeIn(root_val, scale=1.06), run_time=0.22)
