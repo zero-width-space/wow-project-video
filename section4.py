@@ -1,8 +1,12 @@
+<<<<<<< HEAD
 from __future__ import annotations
 
 import math
 from typing import List
 
+=======
+from utils import BaseSection,VideoMobject
+>>>>>>> bd7ae74 (Added demonstration)
 from manim import *
 
 
@@ -195,6 +199,7 @@ class ChessTransformer(Scene):
     def construct(self):
         self.camera.background_color = BG
 
+<<<<<<< HEAD
         # ------------------------------------------------------------
         # 0) Hook: Search tree vs one forward pass
         # ------------------------------------------------------------
@@ -1015,3 +1020,16 @@ class ChessTransformer(Scene):
         self.play(FadeOut(f1), FadeOut(f2), FadeOut(b), FadeOut(glow), FadeOut(mate_txt), FadeOut(wrong),
                   FadeOut(loop), FadeOut(c1), FadeOut(c2), FadeOut(draw), FadeOut(end), run_time=T["fade"])
         self.play(FadeOut(t0), run_time=T["fade"])
+=======
+        top_text = Paragraph(
+            "Here is a demonstration of our model against a human player",
+            "(sped up for brevity, but run in real-time)"
+            font_size=30,
+        ).to_edge(UP)
+        self.play(Write(top_text))
+
+        video=VideoMobject("demonstration.mp4").scale_to_fit_height(5.5).to_edge(DOWN)
+        self.add(video)
+        self.wait_until(lambda:video.finished)
+        self.fade_out()
+>>>>>>> bd7ae74 (Added demonstration)

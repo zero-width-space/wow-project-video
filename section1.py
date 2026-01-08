@@ -26,7 +26,7 @@ class ChessIntro(BaseSection):
         video = VideoMobject("pieces.mp4").scale_to_fit_height(5).to_edge(DOWN)
         self.add(video)
         self.play(Write(text))
-        self.wait(5)
+        self.wait_until(lambda: video.finished)
         self.fade_out()
 
         text = Paragraph(
@@ -38,5 +38,9 @@ class ChessIntro(BaseSection):
         video = VideoMobject("stockfish.mp4").scale_to_fit_height(5).to_edge(DOWN)
         self.add(video)
         self.play(Write(text))
+<<<<<<< HEAD
         self.wait(7.5)
+=======
+        self.wait_until(lambda: video.finished)
+>>>>>>> bd7ae74 (Added demonstration)
         self.fade_out()
