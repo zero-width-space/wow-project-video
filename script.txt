@@ -1,4 +1,38 @@
 Section 0 (Opening):
-Section 1 (Introduction to chess)
-Section 2 (Introduction to chess engines)
-Section 3 ()
+Hello, and welcome to our W@W project, on building an AI chess engine, using neural networks
+We are Li Dianheng, Tan Le Qian, and Miyazaki Keishi
+
+Section 1 (Introduction to chess):
+First, a brief introduction to chess
+Chess is a 2-player board game where the goal is to surround and capture the opponent's king, which is known as checkmate
+Different pieces can move in different ways, which adds to the complexity of the game
+Despite the simplicity of the rules, chess strategies can be complex, making it a good benchmark for testing the capabilities of computers
+A chess engine is a computer program that tries to play the best possible move at each point, in response to the user, to maximise its chances of winning 
+
+Section 2 (Introduction to chess engines):
+There are 2 types of chess engines we will be focusing on today
+Firstly, there are traditional chess engines, the most famous of which is known as Stockfish, that search a tree of possible board positions, along with other algorithms, in order to find the best outcome
+However, these algorithms can be slow due to the large number of positions that need to be searched
+Secondly, in recent years, neural networks, a computational model used in machine learning, has started to be applied to chess engines, such as AlphaZero
+However, neural networks require time and compute power to train and be effective
+For example, AlphaZero uses self-play, where the AI plays against itself to improve, which can only be done feasibly with specialised commercial hardware
+Neural networks use a neural network architecture known as a transformer, which is also used in Large Language Models such as ChatGPT
+For more information about neural networks, we highly recommend the series on neural networks by 3Blue1Brown on YouTube
+
+Section 3 (Our Model):
+Due to time and hardware constraints, we are unable to create a model large enough for self-play to be effective
+Therefore, we decided to use distillation, where we use a preexisting engine to generate data for our model to train on
+For our model, we used stockfish to generate data
+Here is the performance of our data in terms of loss or "error", which measures how much our model fails
+As you can see, there is a downward trend as it is trained on more data
+Here is the performance of our data in terms of Lichess puzzle accuracy, separated by puzzle rating
+Lichess is a popular chess website that provides chess puzzles that can also be used to benchmark chess engines
+As you can see by the data, our engine gets 50% accuracy at around {rating} rating, which means it is around {level}
+
+Section 4 (Demonstration):
+Here is a demonstration of our model against a human player
+{commentary}
+
+Section 5 (Ending):
+Thank you for watching!
+This project would not have been possible without 3Blue1Brown's YouTube series, etc...
