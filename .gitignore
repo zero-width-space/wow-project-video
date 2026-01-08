@@ -1,4 +1,4 @@
 __pycache__/
 .venv/
 media/
-output.mp4
+output*.mp4
