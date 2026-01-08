@@ -1,15 +1,13 @@
 from utils import BaseSection
 from manim import *
-import chess
-import chess.svg
-from pathlib import Path
-import tempfile
-import uuid
-import numpy as np  # IMPORTANT: needed for board overlay geometry
 
 
-class EngineIntro(BaseSection):
-    def show_stockfish_tree(self):
+# ============================================================
+# Replacement: drop-in scene that runs your provided code
+# (kept the animation content the same; only wrapped in a method)
+# ============================================================
+class StockfishExplainer(Scene):
+    def construct(self):
         # -----------------------------
         # Z-LAYERS
         # -----------------------------
@@ -48,6 +46,13 @@ class EngineIntro(BaseSection):
         # =============================
         # 2) CHESS BOARD (SVG) + FEATURE SWEEP + EVAL BAR
         # =============================
+        import chess
+        import chess.svg
+        from pathlib import Path
+        import tempfile
+        import uuid
+        import numpy as np
+
         fen = "rnbq1rk1/pp2bppp/4pn2/2p5/2BPP3/2N2N2/PP3PPP/R1BQ1RK1 w - - 0 8"
         board = chess.Board(fen)
 
@@ -191,9 +196,7 @@ class EngineIntro(BaseSection):
         eval_value = Text("?", font_size=26, color=WHITE)
 
         # Increase spacing so "+" never collides with the colon
-        eval_group = VGroup(eval_label, eval_value).arrange(
-            RIGHT, buff=0.32
-        )  # was 0.18
+        eval_group = VGroup(eval_label, eval_value).arrange(RIGHT, buff=0.32)
         eval_group.next_to(bar_line, UP, buff=0.22)
         eval_group.set_z_index(Z_UI)
 
@@ -210,9 +213,6 @@ class EngineIntro(BaseSection):
 
         def marker_update(m):
             m.move_to(marker_pos_from_t(t_marker.get_value()))
-
-        def marker_update_lambda(m):
-            marker_update(m)
 
         marker.add_updater(lambda m: marker_update(m))
 
@@ -239,7 +239,7 @@ class EngineIntro(BaseSection):
         )
 
         # Final centipawn-ish evaluation (in pawns, displayed like Stockfish)
-        final_eval_pawns = +0.68  # shows as +0.68
+        final_eval_pawns = +0.78
         # Map [-2..+2] -> [0..1]
         BAR_MIN, BAR_MAX = -2.0, 2.0
         final_t = (final_eval_pawns - BAR_MIN) / (BAR_MAX - BAR_MIN)
@@ -248,7 +248,7 @@ class EngineIntro(BaseSection):
         # Create the final value text in-place (same position), with proper color
         eval_str = f"{final_eval_pawns:+.2f}"
         eval_color = GREEN_B if final_eval_pawns >= 0 else RED_B
-        eval_value_target = Text(eval_str, font_size=26, color=eval_color).shift(RIGHT*0.08)
+        eval_value_target = Text(eval_str, font_size=26, color=eval_color)
         eval_value_target.move_to(eval_value.get_center())
         eval_value_target.set_z_index(Z_UI)
 
@@ -386,14 +386,12 @@ class EngineIntro(BaseSection):
         tree.add(*edges_all)
 
 
-        # --- Remove board + eval UI before showing the tree
         self.play(
             FadeOut(board_svg, shift=LEFT * 0.10),
             FadeOut(bar_group, shift=DOWN * 0.06),
             FadeOut(board_to_bar, shift=DOWN * 0.06),
             run_time=0.35,
         )
-
         self.play(FadeIn(tree, shift=UP * 0.12), run_time=0.60)
 
         # Alpha/Beta HUD near root (in pawns)
@@ -409,8 +407,7 @@ class EngineIntro(BaseSection):
         )
         self.play(FadeIn(alpha_hud), FadeIn(beta_hud), run_time=0.25)
 
-        TREE_SLOW = 2  # >1.0 = slower tree pacing
-        def visit(node_obj, edge_obj=None, rt=0.22*TREE_SLOW):
+        def visit(node_obj, edge_obj=None, rt=0.22):
             anims = [node_obj.animate.set_fill("#2a3347", opacity=1.0)]
             if edge_obj is not None:
                 anims.append(
@@ -418,7 +415,7 @@ class EngineIntro(BaseSection):
                 )
             return AnimationGroup(*anims, run_time=rt, lag_ratio=0.0)
 
-        def unvisit(node_obj, edge_obj=None, rt=0.15*TREE_SLOW):
+        def unvisit(node_obj, edge_obj=None, rt=0.15):
             anims = [node_obj.animate.set_fill("#1b2230", opacity=1.0)]
             if edge_obj is not None:
                 anims.append(
@@ -441,12 +438,11 @@ class EngineIntro(BaseSection):
         leaf_texts = [None] * 8
 
         def show_leaf(i, node_leaf, edge_to_leaf):
-            self.play(visit(node_leaf, edge_to_leaf), run_time=0.20 * TREE_SLOW)
-            t = cp_text(leaf_v[i], size=20).move_to(node_leaf.get_center())
+            self.play(visit(node_leaf, edge_to_leaf), run_time=0.20)
+            t = cp_text(leaf_v[i], size=20).move_to(val_above(node_leaf, 0.26))
             leaf_texts[i] = t
-            self.play(FadeIn(t, scale=1.02), run_time=0.18 * TREE_SLOW)
-            self.play(unvisit(node_leaf, edge_to_leaf), run_time=0.11 * TREE_SLOW)
-
+            self.play(FadeIn(t, shift=UP * 0.08), run_time=0.16)
+            self.play(unvisit(node_leaf, edge_to_leaf), run_time=0.11)
 
         self.play(visit(root), run_time=0.14)
 
@@ -554,10 +550,42 @@ class EngineIntro(BaseSection):
             run_time=0.20,
         )
 
-        self.wait(0.9)
+        self.wait(1)
+        
+        
+        # --- Clean handoff: remove EVERYTHING from this segment (but don't touch outside text)
+        leaf_group = VGroup(*[t for t in leaf_texts if t is not None])
+
+        cleanup = Group(
+            logo,
+            tree,
+            alpha_hud,
+            beta_hud,
+            beta_at_B,
+            prune_tag,
+            Xb2,
+            leaf_group,
+            A1_val,
+            A2_val,
+            A_val,
+            B1_val,
+            B_val,
+            root_val,
+        )
+
+        self.play(FadeOut(cleanup), run_time=0.45)
 
 
 
+# ============================================================
+# Your original section, with ALL stockfish-related things removed.
+# The removed parts include:
+# - show_stockfish_tree()
+# - any "Traditional engines (e.g. Stockfish)" text
+# - any bridge text describing traditional engines/pruning
+# Replaced with: StockfishExplainer().construct() as the animation segment
+# ============================================================
+class EngineIntro(BaseSection):
     def show_alphazero_flowchart(self):
         # A clearer AlphaZero loop:
         # 1) Start with a neural net f_theta that outputs (policy, value)
@@ -591,8 +619,9 @@ class EngineIntro(BaseSection):
             ),
             Paragraph("Training targets", "(π, z)", font_size=32, alignment="center")
             .scale(0.5),
-            Paragraph("Update the net", "to match π and z", font_size=32, alignment="center")
-            .scale(0.5),
+            Paragraph(
+                "Update the net", "to match π and z", font_size=32, alignment="center"
+            ).scale(0.5),
         ]
 
         arrows = [
@@ -748,41 +777,23 @@ class EngineIntro(BaseSection):
         self.wait(2)
 
     def construct(self):
-        top_text = Paragraph(
-            "There are 2 main types of chess engines", font_size=30
-        ).to_edge(UP)
+        top_text = Paragraph("There are 2 main types of chess engines", font_size=30).to_edge(
+            UP
+        )
 
         self.play(Write(top_text))
         self.wait()
 
         # =============================
-        # 1) Traditional engines (Stockfish)
+        # 1) (Stockfish-related text removed)
+        # Replace the first segment with the provided animation scene
         # =============================
         new_text = Paragraph("1. Traditional engines", font_size=30).to_edge(UP)
         self.play(Transform(top_text, new_text))
+        self.wait(0.2)
 
-        body_text = Paragraph(
-            "Traditional engines (e.g. Stockfish) search a huge tree of possible moves.",
-            "They score each position with a fast evaluation function, then use",
-            "alpha-beta pruning to skip branches that cannot change the final choice.",
-            font_size=30,
-        ).next_to(top_text, DOWN)
-
-        self.play(Write(body_text))
-        self.wait(0.3)
-
-        self.play(FadeOut(body_text))
-        self.show_stockfish_tree()
-
-        # Bridge sentence (kept short and accurate)
-        body_text = Paragraph(
-            "Even with pruning, the number of positions grows exponentially with depth,",
-            "so engines rely on pruning, move ordering, and many heuristics to search deeper.",
-            font_size=30,
-        ).next_to(top_text, DOWN)
-        self.play(Write(body_text))
-        self.wait(0.8)
-        self.play(FadeOut(body_text))
+        # Run the replacement animation (logo/board/eval/tree) from the provided code
+        StockfishExplainer.construct(self)
 
         # =============================
         # 2) Neural-network engines (AlphaZero-style)
