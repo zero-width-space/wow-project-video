@@ -4,14 +4,15 @@ Hello everyone. Chess and programming has always been my hobby, so I decided to 
 Section 1 (Introduction to chess):
 This is chess, a 2-player board game where the goal is to checkmate the opponent's king. Different pieces can move in different ways, which adds to the complexity of the game.
 
-Despite the simplicity of the rules, chess strategies can be complex and , making it a good benchmark for testing the capabilities of computers. In recent years, chess has become a landmark testing ground for AI problem solving and decision making.
-A chess engine is a computer program that tries to play the best possible move at each point, in response to the user, to maximise its chances of winning 
+Despite the simplicity of the rules, chess strategies can be complex, making it a good benchmark for testing the capabilities of computers.
+
+A chess engine is a computer program that analyses a position to find the best possible move at a position to maximise its chances of winning.
 
 Section 2 (Introduction to chess engines):
-There are 2 types of chess engines we will be focusing on today
-Firstly, there are traditional chess engines, the most famous of which is known as Stockfish, that search a tree of possible board positions, along with other algorithms, in order to find the best outcome
-However, these algorithms can be slow due to the large number of positions that need to be searched
-Secondly, in recent years, neural networks, a computational model used in machine learning, has started to be applied to chess engines, such as AlphaZero
+There are 2 main types of chess engines.
+Firstly, there are traditional chess engines. The current best is known as Stockfish. It  that search a tree of possible board positions, along with other algorithms, in order to find the best outcome
+However, these algorithms can be slow due to the large number of positions that need to be searched.
+In recent years, neural networks, a computational model used in machine learning, has started to be applied to chess engines, such as AlphaZero
 However, neural networks require time and compute power to train and be effective
 For example, AlphaZero uses self-play, where the AI plays against itself to improve, which can only be done feasibly with specialised commercial hardware
 Neural networks use a neural network architecture known as a transformer, which is also used in Large Language Models such as ChatGPT

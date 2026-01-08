@@ -8,4 +8,5 @@ class Opening(BaseSection):
             "Making an AI chess engine",
             "Li Dianheng, Miyazaki Keishi, Tan Le Qian",
             "Made with Manim",
+            time=1
         )

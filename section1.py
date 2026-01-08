@@ -4,7 +4,7 @@ from manim import *
 
 class ChessIntro(BaseSection):
     def construct(self):
-        self.show_section_title("Introduction to chess", "A brief overview")
+        self.show_section_title("Introduction to chess")
         text = Paragraph(
             "Chess is a 2 player game where the goal is to capture,",
             'or "checkmate", the other player\'s king',
@@ -38,5 +38,5 @@ class ChessIntro(BaseSection):
         video = VideoMobject("stockfish.mp4").scale_to_fit_height(5).to_edge(DOWN)
         self.add(video)
         self.play(Write(text))
-        self.wait(2)
+        self.wait(6)
         self.fade_out()

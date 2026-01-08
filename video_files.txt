@@ -1,6 +1,0 @@
-file 'media/videos/section0/2160p60/Opening.mp4'
-file 'media/videos/section1/2160p60/ChessIntro.mp4'
-file 'media/videos/section2/2160p60/EngineIntro.mp4'
-file 'media/videos/section3/2160p60/OurModel.mp4'
-file 'media/videos/section4/2160p60/Demonstration.mp4'
-file 'media/videos/section5/2160p60/Ending.mp4'
