@@ -1,4 +1,4 @@
 
 
 
-simplified version of negamax (minimax variant)
+This is simplified version of negamax (minimax variant)
