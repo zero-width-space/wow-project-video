@@ -4,7 +4,7 @@ from manim import *
 
 class Opening(BaseSection):
     def construct(self) -> None:
-        self.show_section_title("Building a chess engine", "Video made with Manim")
+        self.show_section_title("Making an AI chess engine", "Video made with Manim")
         body_text = Paragraph(
             "Made by",
             "Li Dianheng",
