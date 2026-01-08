@@ -13,11 +13,7 @@ class Demonstration(BaseSection):
         ).to_edge(UP)
         self.play(Write(top_text))
 
-        video = (
-            VideoMobject("demonstration.mp4", speed=3)
-            .scale_to_fit_height(5.5)
-            .to_edge(DOWN)
-        )
+        video = VideoMobject("demonstration.mp4").scale_to_fit_height(5.5).to_edge(DOWN)
         self.add(video)
         self.wait_until(lambda: video.finished)
         self.play(FadeOut(video))
