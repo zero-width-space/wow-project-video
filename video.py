@@ -41,6 +41,7 @@ class VideoMobject(ImageMobject):
         self._id = id(self)
         self.status = VideoStatus()
         self.status.videoObject = cv2.VideoCapture(filename)
+        self.finished = False
 
         self.status.videoObject.set(cv2.CAP_PROP_POS_FRAMES, 1)
         ret, frame = self.status.videoObject.read()
@@ -67,6 +68,8 @@ class VideoMobject(ImageMobject):
         status.time += 1000 * dt * mobj.speed
         self.status.videoObject.set(cv2.CAP_PROP_POS_MSEC, status.time)
         ret, frame = self.status.videoObject.read()
+        if ret == False:
+            self.finished = True
         if (ret == False) and self.loop:
             status.time = 0
             self.status.videoObject.set(cv2.CAP_PROP_POS_MSEC, status.time)
