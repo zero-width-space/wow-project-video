@@ -868,9 +868,9 @@ class EngineIntro(BaseSection):
 
         # Transformer bridge (kept: your original section but slightly clearer)
         body_text = Paragraph(
-            "Neural networks often use transformers — the same general architecture",
-            "used in large language models — to build strong representations",
-            "from input tokens, allowing it to play well.",
+            "Neural networks often use transformers, which are the same general",
+            "architecture used in large language models like ChatGPT, to build",
+            "strong representations from input tokens, allowing it to play well.",
             font_size=30,
         ).next_to(top_text, DOWN)
         self.play(Write(body_text))
@@ -883,8 +883,9 @@ class EngineIntro(BaseSection):
         )
 
         new_text = Paragraph(
-            "For more information, check out the YouTube series on deep learning",
-            "by 3Blue1Brown.",
+            "For more information about this topic, check out the YouTube series",
+            "on deep learning by 3Blue1Brown.",
+            "(https://www.youtube.com/playlist?list=PLZHQObOWTQDNU6R1_67000Dx_ZCJB-3pi)"
             font_size=30,
         ).next_to(top_text, DOWN)
         self.play(Transform(body_text, new_text))

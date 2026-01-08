@@ -13,15 +13,15 @@ QUALITY = "l"
 parts = [
     "section0",
     "section1",
-    "section2",
+    "section2 EngineIntro",
     "section3",
-    "section4",
+    # "section4",
     "section6",
     "section7",
 ]
 
-# for part in parts:
-#     os.system(f"manim -q{QUALITY} {part}.py")
+for part in parts:
+    os.system(f"manim -q{QUALITY} {part}.py")
 
 with open("video_files.txt", "w") as file:
     for part in parts:
