@@ -5,8 +5,8 @@ VIDEO_FILE = "video_files.txt"
 
 parts = ["section0", "section1", "section2", "section3", "section4", "section5"]
 
-# for part in parts:
-#     os.system(f"manim -qh {part}.py")
+for part in parts:
+    os.system(f"manim -qh {part}.py")
 
 with open(VIDEO_FILE, "w") as file:
     file.write(
@@ -18,4 +18,4 @@ with open(VIDEO_FILE, "w") as file:
         )
     )
 
-# ffmpeg -f concat -i video_files.txt output.mp4
+os.system("ffmpeg -f concat -i video_files.txt output.mp4")
