@@ -9,7 +9,7 @@ RESOLUTION = {
     "p": "1440p60",
     "k": "2160p60",
 }
-QUALITY = "k"
+QUALITY = "m"
 
 parts = ["section0", "section1", "section2", "section3", "section4", "section5"]
 

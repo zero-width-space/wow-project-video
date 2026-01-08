@@ -58,16 +58,8 @@ class OurModel(BaseSection):
         ).to_edge(UP)
         self.play(Transform(top_text, new_text))
 
-        body_text = Paragraph(
-            "Insert something here",
-            "Insert something here",
-            "Insert something here",
-            "Insert something here",
-            "Insert something here",
-            font="monospace",
-            font_size=32,
-        ).scale(0.5)
-        self.play(Write(body_text))
+        image = ImageMobject("training.png").scale_to_fit_height(6).to_edge(DOWN)
+        self.play(FadeIn(image))
         self.wait()
 
         self.play(*[FadeOut(obj) for obj in self.mobjects if obj is not top_text])
@@ -163,6 +155,7 @@ class OurModel(BaseSection):
         new_text = Paragraph(
             "Here is a graph showing the accuracy of our model in",
             "Lichess puzzles, seperated by puzzle difficulty rating",
+            "FAKE DATA",
             font_size=30,
         ).to_edge(UP)
         self.play(Transform(top_text, new_text))
