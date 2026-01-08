@@ -19,8 +19,8 @@ class Demonstration(BaseSection):
             "Insert video here",
             "Insert video here",
             font="monospace",
-            font_size=16,
-        )
+            font_size=32,
+        ).scale(0.5)
         self.play(Write(body_text))
         self.wait()
         self.fade_out()

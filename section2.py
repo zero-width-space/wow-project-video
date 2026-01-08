@@ -468,10 +468,10 @@ class EngineIntro(BaseSection):
         ]
 
         texts = [
-            Text("Initialise neural network", font_size=16),
-            Text("Self-play", font_size=16),
-            Text("Generate training data", font_size=16),
-            Text("Train neural network", font_size=16),
+            Text("Initialise neural network", font_size=32).scale(0.5),
+            Text("Self-play", font_size=32).scale(0.5),
+            Text("Generate training data", font_size=32).scale(0.5),
+            Text("Train neural network", font_size=32).scale(0.5),
         ]
 
         arrows = [

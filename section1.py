@@ -14,7 +14,7 @@ class ChessIntro(BaseSection):
         self.add(video)
         self.play(Write(text))
         self.wait(5)
-        text = Text("Checkmate!", font_size=16).next_to(video, UP)
+        text = Text("Checkmate!", font_size=32).scale(0.5).next_to(video, UP)
         self.play(Write(text))
         self.wait()
         self.fade_out()

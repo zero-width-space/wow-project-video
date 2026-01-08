@@ -36,7 +36,9 @@ class OurModel(BaseSection):
         )
         text = Text("Our model", font_size=24).move_to(right_box)
         arrow = Arrow(left_box.get_edge_center(RIGHT), right_box.get_edge_center(LEFT))
-        arrow_text = Text("Generate training data", font_size=16).next_to(arrow, UP)
+        arrow_text = (
+            Text("Generate training data", font_size=32).scale(0.5).next_to(arrow, UP)
+        )
         self.play(
             Create(left_box),
             FadeIn(logo),
@@ -62,8 +64,8 @@ class OurModel(BaseSection):
             "Insert something here",
             "Insert something here",
             font="monospace",
-            font_size=16,
-        )
+            font_size=32,
+        ).scale(0.5)
         self.play(Write(body_text))
         self.wait()
 
@@ -89,8 +91,8 @@ class OurModel(BaseSection):
         ).next_to(top_text, DOWN)
         graph = axes.plot(lambda x: 5 * np.sin(x / 100000) + 5)
         labels = axes.get_axis_labels(
-            Text("Training steps", font_size=16),
-            Text("Loss (lower is better)", font_size=16),
+            Text("Training steps", font_size=32).scale(0.5),
+            Text("Loss (lower is better)", font_size=32).scale(0.5),
         )
         self.play(Create(axes), Create(labels))
         self.wait()
