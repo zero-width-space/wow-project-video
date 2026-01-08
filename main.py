@@ -26,4 +26,4 @@ with open(VIDEO_FILE, "w") as file:
         )
     )
 
-os.system("ffmpeg -y -f concat -i video_files.txt output.mp4")
+os.system(f"ffmpeg -y -f concat -i video_files.txt output_{RESOLUTION[QUALITY]}.mp4")

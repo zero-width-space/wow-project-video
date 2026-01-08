@@ -1,4 +1,5 @@
 from utils import BaseSection
+from parse_loss import get_data
 from manim import *
 
 
@@ -79,24 +80,35 @@ class OurModel(BaseSection):
         self.play(Transform(top_text, new_text))
 
         axes = Axes(
-            x_range=(0, 1000000, 50000),
-            y_range=(0, 10, 1),
+            x_range=(0, 1200000, 50000),
+            y_range=(1, 5, 0.2),
             x_length=10,
             y_length=5,
             x_axis_config={
-                "numbers_to_include": np.arange(0, 1000001, 200000),
+                "numbers_to_include": np.arange(0, 1200001, 200000),
+                "numbers_with_elongated_ticks": np.arange(0, 1200001, 100000),
                 "label_direction": DOWN,
             },
-            y_axis_config={"numbers_to_include": np.arange(0, 11, 1)},
-        ).next_to(top_text, DOWN)
-        graph = axes.plot(lambda x: 5 * np.sin(x / 100000) + 5)
+            y_axis_config={"numbers_to_include": np.arange(2, 5.01, 0.5)},
+        ).next_to(top_text, DOWN, buff=0.5)
+
+        _, smooth_data = get_data()
+
+        smooth_graph = axes.plot_line_graph(
+            x_values=[s for s, _ in smooth_data],
+            y_values=[l for _, l in smooth_data],
+            add_vertex_dots=True,
+            line_color=GRAY,
+            vertex_dot_radius=0.04,
+        )
+
         labels = axes.get_axis_labels(
             Text("Training steps", font_size=32).scale(0.5),
             Text("Loss (lower is better)", font_size=32).scale(0.5),
         )
         self.play(Create(axes), Create(labels))
         self.wait()
-        self.play(Create(graph))
+        self.play(Create(smooth_graph))
         self.wait(2)
 
         self.play(*[FadeOut(obj) for obj in self.mobjects if obj is not top_text])
@@ -113,7 +125,7 @@ class OurModel(BaseSection):
             bar_names=["0-1", "1-2", "2-3", "3-4"],
             x_length=10,
             y_length=5,
-        ).next_to(top_text, DOWN)
+        ).next_to(top_text, DOWN, buff=0.5)
         self.play(Create(bar_chart))
         self.wait(2)
 
