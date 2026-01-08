@@ -150,22 +150,22 @@ class OurModel(BaseSection):
         self.play(Create(smooth_graph))
         self.wait(2)
 
-        self.play(*[FadeOut(obj) for obj in self.mobjects if obj is not top_text])
+        # self.play(*[FadeOut(obj) for obj in self.mobjects if obj is not top_text])
 
-        new_text = Paragraph(
-            "Here is a graph showing the accuracy of our model in",
-            "Lichess puzzles, seperated by puzzle difficulty rating",
-            "FAKE DATA",
-            font_size=30,
-        ).to_edge(UP)
-        self.play(Transform(top_text, new_text))
+        # new_text = Paragraph(
+        #     "Here is a graph showing the accuracy of our model in",
+        #     "Lichess puzzles, seperated by puzzle difficulty rating",
+        #     "FAKE DATA",
+        #     font_size=30,
+        # ).to_edge(UP)
+        # self.play(Transform(top_text, new_text))
 
-        bar_chart = BarChart(
-            values=[1, 2, 3, 4, 5],
-            bar_names=["0-1", "1-2", "2-3", "3-4"],
-            x_length=10,
-            y_length=5,
-        ).next_to(top_text, DOWN, buff=0.75)
-        self.play(Create(bar_chart))
-        self.wait(2)
+        # bar_chart = BarChart(
+        #     values=[1, 2, 3, 4, 5],
+        #     bar_names=["0-1", "1-2", "2-3", "3-4"],
+        #     x_length=10,
+        #     y_length=5,
+        # ).next_to(top_text, DOWN, buff=0.75)
+        # self.play(Create(bar_chart))
+        # self.wait(2)
         self.fade_out()

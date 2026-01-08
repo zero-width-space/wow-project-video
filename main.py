@@ -9,12 +9,20 @@ RESOLUTION = {
     "p": "1440p60",
     "k": "2160p60",
 }
-QUALITY = "l"
+QUALITY = "k"
 
-parts = ["section0", "section1", "section2", "section3", "section4", "section5"]
+parts = [
+    "section0",
+    "section1",
+    "section2",
+    "section3",
+    "section4",
+    "section6",
+    "section7",
+]
 
-for part in parts:
-    os.system(f"manim -q{QUALITY} {part}.py")
+# for part in parts:
+#     os.system(f"manim -q{QUALITY} {part}.py")
 
 with open(VIDEO_FILE, "w") as file:
     file.write(
