@@ -67,8 +67,8 @@ class StockfishExplainer(Scene):
 
         self.play(FadeIn(board_svg, shift=RIGHT * 0.15), run_time=0.65)
 
-        # Longer pause to look at the board before the "taking in" grid sweep
-        self.wait(0.85)  # increased
+        # Pause to look at the board before the "taking in" grid sweep
+        self.wait(1.1)
 
         # ---- Overlay grid edges ABOVE board
         overlay = VGroup().set_z_index(Z_OVERLAY)
@@ -144,8 +144,21 @@ class StockfishExplainer(Scene):
         sweep_anims = [edge_pulse_anim(e, d, total_window=sweep_window) for e, d in zip(edges, delays)]
         self.play(AnimationGroup(*sweep_anims, lag_ratio=0.0), run_time=sweep_window)
 
-        # 0.2s after sweep completes, draw arrow, THEN evaluation sequence begins
-        self.wait(0.2)
+        # After sweep completes, draw arrow, THEN evaluation bar begins
+        self.wait(0.1)
+
+        arrow_y = board_svg.get_center()[1]
+        board_to_bar = Arrow(
+            start=board_svg.get_right() + RIGHT * 0.15,
+            end=RIGHT * 1.10 + UP * arrow_y,   # just a horizontal target point
+            buff=0.0,
+            stroke_width=4,
+            max_tip_length_to_length_ratio=0.14,
+        )
+        board_to_bar.set_stroke(WHITE, opacity=0.65)
+        board_to_bar.set_z_index(Z_UI)
+        self.play(Create(board_to_bar), run_time=0.28)
+
 
         # ---- Eval bar (centipawn-like in pawns)
         # We'll show -2.0 ... 0.0 ... +2.0 (pawns).
@@ -192,20 +205,6 @@ class StockfishExplainer(Scene):
 
         bar_group.add(bar_line, tickL, tickM, tickR, labelL, labelM, labelR, eval_group, marker)
         self.play(FadeIn(bar_group, shift=UP * 0.10), run_time=0.45)
-
-        # Arrow pointing from board to the bar (board -> bar), should now be horizontal
-        board_to_bar = Arrow(
-            start=board_svg.get_right() + RIGHT * 0.15,
-            end=bar_left + LEFT * 0.10,
-            buff=0.0,
-            stroke_width=4,
-            max_tip_length_to_length_ratio=0.14,
-        )
-        board_to_bar.set_stroke(WHITE, opacity=0.65)
-        board_to_bar.set_z_index(Z_UI)
-
-        # Draw (Create) if possible; otherwise it'll still look like a drawn reveal
-        self.play(Create(board_to_bar), run_time=0.28)
 
         # Marker "searching" while eval is unknown
         self.play(t_marker.animate.set_value(1.0), run_time=0.55, rate_func=rate_functions.ease_in_out_sine)
