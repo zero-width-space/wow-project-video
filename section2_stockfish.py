@@ -139,14 +139,12 @@ class StockfishExplainer(Scene):
                 mobj.set_stroke(opacity=op)
             return UpdateFromAlphaFunc(edge, updater)
 
-        # Slower overall sweep
-        sweep_window = 3.35  # was 2.5
+        # Slower overall sweep, hardcoded!
+        sweep_window = 1.5
         sweep_anims = [edge_pulse_anim(e, d, total_window=sweep_window) for e, d in zip(edges, delays)]
         self.play(AnimationGroup(*sweep_anims, lag_ratio=0.0), run_time=sweep_window)
 
-        # After sweep completes, draw arrow, THEN evaluation bar begins
-        self.wait(0.1)
-
+        # After sweep completes, draw arrow
         arrow_y = board_svg.get_center()[1]
         board_to_bar = Arrow(
             start=board_svg.get_right() + RIGHT * 0.15,
