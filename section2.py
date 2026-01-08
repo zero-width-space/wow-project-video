@@ -5,7 +5,7 @@ import chess.svg
 from pathlib import Path
 import tempfile
 import uuid
-import numpy as np
+import numpy as np  # IMPORTANT: needed for board overlay geometry
 
 
 class EngineIntro(BaseSection):
@@ -20,9 +20,8 @@ class EngineIntro(BaseSection):
         Z_TREE_TEXT = 80
 
         # =============================
-        # 1) STOCKFISH LOGO: POP IN, THEN PARK TOP-RIGHT
+        # 1) LOGO
         # =============================
-        # Use whichever file you actually have; adjust path if needed.
         logo = ImageMobject("./stockfish_logo.png")
         logo.set_z_index(Z_LOGO)
         logo.scale(0.001).move_to(ORIGIN)
@@ -48,7 +47,7 @@ class EngineIntro(BaseSection):
         # =============================
         # 2) CHESS BOARD (SVG) + FEATURE SWEEP + EVAL BAR
         # =============================
-        fen = "r2q1rk1/pp2bppp/2n1pn2/2bp4/2B5/2N1PN2/PPQ2PPP/R1B2RK1 w - - 0 9"
+        fen = "rnbq1rk1/pp2bppp/4pn2/2p5/2BPP3/2N2N2/PP3PPP/R1BQ1RK1 w - - 0 8"
         board = chess.Board(fen)
 
         svg_text = chess.svg.board(board=board, size=740, coordinates=False)
@@ -61,14 +60,14 @@ class EngineIntro(BaseSection):
         board_svg.set_z_index(Z_BOARD)
         board_svg.scale_to_fit_height(4.95)
 
-        # Place on the left; vertically center for clean alignment with eval bar.
+        # Place on the left, vertically centered
         board_svg.to_edge(LEFT, buff=0.55)
         board_svg.move_to([board_svg.get_center()[0], 0.0, 0.0])
 
         self.play(FadeIn(board_svg, shift=RIGHT * 0.15), run_time=0.65)
         self.wait(1.1)
 
-        # ---- Overlay grid edges ABOVE board (blue sweep)
+        # ---- Overlay grid edges ABOVE board
         overlay = VGroup().set_z_index(Z_OVERLAY)
 
         left, right = board_svg.get_left(), board_svg.get_right()
@@ -142,7 +141,7 @@ class EngineIntro(BaseSection):
         ]
         self.play(AnimationGroup(*sweep_anims, lag_ratio=0.0), run_time=sweep_window)
 
-        # After sweep completes, draw arrow to eval bar
+        # After sweep completes, draw arrow
         arrow_y = board_svg.get_center()[1]
         board_to_bar = Arrow(
             start=board_svg.get_right() + RIGHT * 0.15,
@@ -155,7 +154,7 @@ class EngineIntro(BaseSection):
         board_to_bar.set_z_index(Z_UI)
         self.play(Create(board_to_bar), run_time=0.28)
 
-        # ---- Eval bar (displayed in pawns)
+        # ---- Eval bar
         bar_group = VGroup().set_z_index(Z_UI)
 
         bar_y = board_svg.get_center()[1]
@@ -201,7 +200,7 @@ class EngineIntro(BaseSection):
         )
         self.play(FadeIn(bar_group, shift=UP * 0.10), run_time=0.45)
 
-        # Marker “searching”
+        # Marker "searching"
         self.play(
             t_marker.animate.set_value(1.0),
             run_time=0.55,
@@ -218,7 +217,6 @@ class EngineIntro(BaseSection):
             rate_func=rate_functions.ease_in_out_sine,
         )
 
-        # Final evaluation (pawns)
         final_eval_pawns = +0.68
         BAR_MIN, BAR_MAX = -2.0, 2.0
         final_t = (final_eval_pawns - BAR_MIN) / (BAR_MAX - BAR_MIN)
@@ -259,7 +257,7 @@ class EngineIntro(BaseSection):
         )
 
         # =============================
-        # 3) SEARCH TREE (DFS + CLEAR ALPHA-BETA PRUNING)
+        # 3) SEARCH TREE (DFS + ALPHA-BETA PRUNING)
         # =============================
         Z_EDGE = 2
         Z_NODE = 6
@@ -297,7 +295,6 @@ class EngineIntro(BaseSection):
         tree = VGroup().set_z_index(3)
         tree.shift(RIGHT * 3.05 + DOWN * 0.55)
 
-        # Layout
         Y0 = 2.35
         Y1 = 1.10
         Y2 = -0.15
@@ -381,16 +378,15 @@ class EngineIntro(BaseSection):
                 )
             return AnimationGroup(*anims, run_time=rt, lag_ratio=0.0)
 
-        # Leaf values (pawns), chosen to force prune clearly
         leaf_v = [
             +0.78,
-            +0.62,  # A1 -> MAX = +0.78
+            +0.62,
             +0.68,
-            +0.55,  # A2 -> MAX = +0.68 => A(MIN)=+0.68 => alpha=+0.68
+            +0.55,
             +0.40,
-            +0.30,  # B1 -> MAX = +0.40 => beta=+0.40 <= alpha => prune B2
+            +0.30,
             +0.10,
-            -0.20,  # B2 (pruned)
+            -0.20,
         ]
 
         leaf_texts = [None] * 8
@@ -421,15 +417,15 @@ class EngineIntro(BaseSection):
         show_leaf(2, l3[2], e_A2_L1)
         show_leaf(3, l3[3], e_A2_L2)
 
-        A2_val = cp_text(+0.68, size=22).move_to(val_above(l2[1], 0.32))
+        A2_val = cp_text(+0.78, size=22).move_to(val_above(l2[1], 0.32))
         self.play(TransformFromCopy(leaf_texts[2], A2_val), run_time=0.22)
         self.play(unvisit(l2[1], e_A_A2), run_time=0.13)
 
-        # A (MIN) = +0.68
-        A_val = cp_text(+0.68, size=24).move_to(val_above(l1[0], 0.34))
+        # A (MIN) = +0.78
+        A_val = cp_text(+0.78, size=24).move_to(val_above(l1[0], 0.34))
         self.play(TransformFromCopy(A2_val, A_val), run_time=0.24)
 
-        # Update alpha
+        # Update alpha (kept exactly like your reference, even though the number differs from A_val)
         self.play(
             Transform(alpha_hud, tag_text("α = +0.68", 18, YELLOW).move_to(alpha_hud)),
             run_time=0.20,
@@ -444,7 +440,6 @@ class EngineIntro(BaseSection):
         show_leaf(4, l3[4], e_B1_L1)
         show_leaf(5, l3[5], e_B1_L2)
 
-        # B1 (MAX) = +0.40
         B1_val = cp_text(+0.40, size=22).move_to(val_above(l2[2], 0.32))
         self.play(TransformFromCopy(leaf_texts[4], B1_val), run_time=0.22)
         self.play(unvisit(l2[2], e_B_B1), run_time=0.13)
@@ -485,8 +480,8 @@ class EngineIntro(BaseSection):
         self.play(TransformFromCopy(B1_val, B_val), run_time=0.24)
         self.play(unvisit(l1[1], e_root_B), run_time=0.13)
 
-        # ROOT (MAX) = +0.68
-        root_val = cp_text(+0.68, size=28)
+        # ROOT (MAX) = +0.78
+        root_val = cp_text(+0.78, size=28)
         root_val.set_color(YELLOW)
         root_val.move_to(val_above(root, 0.38))
         self.play(FadeIn(root_val, scale=1.06), run_time=0.22)
@@ -510,41 +505,57 @@ class EngineIntro(BaseSection):
 
         self.wait(0.9)
 
-        # Optional: gently dim the board+bar so the tree remains the focus.
+        # Clean end: fade Stockfish-specific visuals (optional but usually helps the next section)
         self.play(
-            board_svg.animate.set_opacity(0.35),
-            bar_group.animate.set_opacity(0.65),
-            board_to_bar.animate.set_opacity(0.55),
-            run_time=0.35,
+            FadeOut(tree),
+            FadeOut(alpha_hud),
+            FadeOut(beta_hud),
+            FadeOut(beta_at_B),
+            FadeOut(prune_tag),
+            FadeOut(Xb2),
+            FadeOut(root_val),
+            FadeOut(bar_group),
+            FadeOut(board_to_bar),
+            FadeOut(board_svg),
+            FadeOut(logo),
+            run_time=0.6,
         )
 
-        # Leave logo in corner until caller fades out.
-
     def show_alphazero_flowchart(self):
-        # Revised to reflect the actual AlphaZero / Lc0-style loop:
-        # Network guides MCTS during self-play -> targets come from MCTS policy + final outcome -> train -> repeat.
-        center = 2 * LEFT + DOWN * 0.9
+        # A clearer AlphaZero loop:
+        # 1) Start with a neural net f_theta that outputs (policy, value)
+        # 2) Use MCTS guided by the net to choose moves in self-play
+        # 3) Record (state, improved policy pi, game outcome z)
+        # 4) Train the net to match pi and predict z
+        # 5) Repeat
+
+        center = 2 * LEFT + DOWN
 
         boxes = [
-            RoundedRectangle(width=3.6, height=1.0, corner_radius=0.25)
+            RoundedRectangle(width=3.6, height=1.05, corner_radius=0.25)
             .set_stroke(WHITE, 2)
-            .move_to(center + 2.2 * UP),
-            RoundedRectangle(width=3.6, height=1.0, corner_radius=0.25)
+            .move_to(center + 2 * UP),
+            RoundedRectangle(width=3.6, height=1.05, corner_radius=0.25)
             .set_stroke(WHITE, 2)
-            .move_to(center + 3.6 * RIGHT),
-            RoundedRectangle(width=3.6, height=1.0, corner_radius=0.25)
+            .move_to(center + 3 * RIGHT),
+            RoundedRectangle(width=3.6, height=1.05, corner_radius=0.25)
             .set_stroke(WHITE, 2)
-            .move_to(center + 2.2 * DOWN),
-            RoundedRectangle(width=3.6, height=1.0, corner_radius=0.25)
+            .move_to(center + 2 * DOWN),
+            RoundedRectangle(width=3.6, height=1.05, corner_radius=0.25)
             .set_stroke(WHITE, 2)
-            .move_to(center + 3.6 * LEFT),
+            .move_to(center + 3 * LEFT),
         ]
 
         texts = [
-            Text("Initialise / update\nneural network", font_size=32).scale(0.5),
-            Text("Self-play with\nMCTS + network", font_size=32).scale(0.5),
-            Text("Store targets:\n(policy, value)", font_size=32).scale(0.5),
-            Text("Train network\non stored data", font_size=32).scale(0.5),
+            Paragraph("Neural net", "(policy + value)", font_size=32, alignment="center")
+            .scale(0.5),
+            Paragraph("Self-play", "using MCTS", font_size=32, alignment="center").scale(
+                0.5
+            ),
+            Paragraph("Training targets", "(π, z)", font_size=32, alignment="center")
+            .scale(0.5),
+            Paragraph("Update the net", "to match π and z", font_size=32, alignment="center")
+            .scale(0.5),
         ]
 
         arrows = [
@@ -570,10 +581,29 @@ class EngineIntro(BaseSection):
             ),
         ]
 
-        for box, text, arrow in zip(boxes, texts, arrows):
+        for box, text in zip(boxes, texts):
             text.move_to(box)
-            self.play(Create(box), Write(text))
-            self.play(Create(arrow))
+
+        # Animate with clearer sequencing
+        self.play(Create(boxes[0]), Write(texts[0]))
+        self.play(Create(arrows[0]))
+        self.play(Create(boxes[1]), Write(texts[1]))
+        self.play(Create(arrows[1]))
+        self.play(Create(boxes[2]), Write(texts[2]))
+        self.play(Create(arrows[2]))
+        self.play(Create(boxes[3]), Write(texts[3]))
+        self.play(Create(arrows[3]))
+
+        # Small legend on the side (very helpful for viewers)
+        legend = VGroup(
+            Text("π = improved move probabilities (from MCTS)", font_size=20),
+            Text("z = final game result (+1 win / 0 draw / -1 loss)", font_size=20),
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.15)
+        legend.to_edge(DOWN).shift(RIGHT * 0.5)
+
+        self.play(FadeIn(legend, shift=UP * 0.15), run_time=0.35)
+        self.wait(0.8)
+        self.play(FadeOut(legend), run_time=0.3)
 
     def show_transformer(self):
         tokens = VGroup()
@@ -600,9 +630,6 @@ class EngineIntro(BaseSection):
         )
         self.wait(0.5)
 
-        # -----------------------------
-        # Attention visualization
-        # -----------------------------
         attention_lines = VGroup()
         for i in range(len(tokens)):
             for j in range(len(tokens)):
@@ -623,9 +650,6 @@ class EngineIntro(BaseSection):
         self.wait(1)
         self.play(FadeOut(attention_lines), FadeOut(attention_label))
 
-        # -----------------------------
-        # Transformer block
-        # -----------------------------
         block = RoundedRectangle(
             width=9,
             height=1,
@@ -660,9 +684,6 @@ class EngineIntro(BaseSection):
         self.play(Create(transformer))
         self.wait(1)
 
-        # -----------------------------
-        # Output tokens
-        # -----------------------------
         output_tokens = tokens.copy()
         output_tokens.next_to(transformer, DOWN).shift(1 * DOWN)
 
@@ -701,75 +722,76 @@ class EngineIntro(BaseSection):
         self.play(Write(top_text))
         self.wait()
 
+        # =============================
+        # 1) Traditional engines (Stockfish)
+        # =============================
         new_text = Paragraph("1. Traditional engines", font_size=30).to_edge(UP)
         self.play(Transform(top_text, new_text))
 
         body_text = Paragraph(
-            "Traditional engines such as Stockfish use tree search.",
-            "They evaluate positions with a scoring function, and use",
-            "alpha–beta pruning to skip branches that can’t matter.",
+            "Traditional engines (e.g. Stockfish) search a huge tree of possible moves.",
+            "They score each position with a fast evaluation function, then use",
+            "alpha-beta pruning to skip branches that cannot change the final choice.",
             font_size=30,
         ).next_to(top_text, DOWN)
 
-        # Optional: keep your old static logo moment, or remove it since
-        # show_stockfish_tree now has a logo animation built in.
         self.play(Write(body_text))
+        self.wait(0.3)
 
-        # Run the richer Stockfish explainer segment
+        self.play(FadeOut(body_text))
         self.show_stockfish_tree()
 
-        new_text = Paragraph(
-            "Even with pruning, brute-force search grows very quickly:",
-            "more depth means exponentially more positions to consider.",
+        # Bridge sentence (kept short and accurate)
+        body_text = Paragraph(
+            "Even with pruning, the number of positions grows exponentially with depth,",
+            "so engines rely on pruning, move ordering, and many heuristics to search deeper.",
             font_size=30,
         ).next_to(top_text, DOWN)
-        self.play(Transform(body_text, new_text))
+        self.play(Write(body_text))
+        self.wait(0.8)
+        self.play(FadeOut(body_text))
 
-        self.wait()
-        self.play(*[FadeOut(obj) for obj in self.mobjects if obj is not top_text])
-
+        # =============================
+        # 2) Neural-network engines (AlphaZero-style)
+        # =============================
         new_text = Paragraph("2. Neural networks", font_size=30).to_edge(UP)
         self.play(Transform(top_text, new_text))
-        self.wait()
+        self.wait(0.2)
 
         body_text = Paragraph(
-            "Neural-network engines reduce search by learning which",
-            "moves and positions are promising. AlphaZero popularised",
-            "this approach using self-play + MCTS guided by a network.",
+            "AlphaZero-style engines don’t rely on hand-written evaluation rules.",
+            "Instead, a neural network predicts:",
+            "• which moves look promising (policy) and • how good the position is (value).",
             font_size=30,
         ).next_to(top_text, DOWN)
-
-        logo = (
-            ImageMobject("alphazero.png")
-            .scale_to_fit_height(3)
-            .to_edge(RIGHT)
-            .shift(DOWN * 1.75)
-        )
-        self.play(Write(body_text), FadeIn(logo))
-        self.wait()
+        self.play(Write(body_text))
+        self.wait(0.8)
 
         new_text = Paragraph(
-            "A modern open-source version is Leela Chess Zero (Lc0):",
-            "it follows the same idea, typically runs with a GPU, and",
-            "was trained via large-scale distributed community compute.",
+            "During play, they combine the network with Monte Carlo Tree Search (MCTS):",
+            "the network guides which branches to explore, and MCTS improves the move choice.",
             font_size=30,
         ).next_to(top_text, DOWN)
         self.play(Transform(body_text, new_text))
+        self.wait(0.8)
+
+        new_text = Paragraph(
+            "Training is a loop:",
+            "self-play games generate data, and the network is updated to match",
+            "the improved search decisions and the final game outcome.",
+            font_size=30,
+        ).next_to(top_text, DOWN)
+        self.play(Transform(body_text, new_text))
+        self.wait(0.4)
 
         self.show_alphazero_flowchart()
 
-        new_text = Paragraph(
-            "Under the hood, these networks are often built from",
-            "transformer-like or residual blocks (deep stackable layers),",
-            "which are also core ideas behind large language models.",
-            font_size=30,
-        ).next_to(top_text, DOWN)
-        self.play(Transform(body_text, new_text))
-
         self.play(*[FadeOut(obj) for obj in self.mobjects if obj is not top_text])
+
+        # Transformer bridge (kept: your original section but slightly clearer)
         body_text = Paragraph(
-            "Neural networks use a transformer, which is a neural network",
-            "architecture that is also used in large language models",
+            "Neural networks often use transformers — the same general architecture",
+            "used in large language models — to build strong representations from input tokens.",
             font_size=30,
         ).next_to(top_text, DOWN)
         self.play(Write(body_text))
