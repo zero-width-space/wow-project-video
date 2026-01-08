@@ -795,7 +795,30 @@ class EngineIntro(BaseSection):
         # =============================
         new_text = Paragraph("1. Traditional engines", font_size=30).to_edge(UP)
         self.play(Transform(top_text, new_text))
-        self.wait(0.2)
+
+        body_text = Paragraph(
+            "Traditional engines (e.g. Stockfish) search a huge tree of",
+            "possible moves. They score each position with a fast evaluation",
+            "function, then use alpha-beta pruning to skip branches that cannot",
+            "change the final choice.",
+            font_size=30,
+        ).next_to(top_text, DOWN)
+
+        self.play(Write(body_text))
+        self.wait()
+
+        self.play(FadeOut(body_text))
+
+        # Bridge sentence (kept short and accurate)
+        body_text = Paragraph(
+            "Even with pruning, the number of positions grows exponentially",
+            "with depth, so engines rely on pruning, move ordering, and",
+            "many heuristics to search deeper.",
+            font_size=30,
+        ).next_to(top_text, DOWN)
+        self.play(Write(body_text))
+        self.wait()
+        self.play(FadeOut(body_text))
 
         # Run the replacement animation (logo/board/eval/tree) from the provided code
         StockfishExplainer.construct(self)
