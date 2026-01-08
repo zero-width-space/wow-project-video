@@ -385,7 +385,6 @@ class StockfishExplainer(Scene):
         ]
         tree.add(*edges_all)
 
-
         self.play(
             FadeOut(board_svg, shift=LEFT * 0.10),
             FadeOut(bar_group, shift=DOWN * 0.06),
@@ -552,7 +551,6 @@ class StockfishExplainer(Scene):
 
         self.wait(1)
 
-
         # --- Clean handoff: remove EVERYTHING from this segment (but don't touch outside text)
         leaf_group = VGroup(*[t for t in leaf_texts if t is not None])
 
@@ -575,6 +573,7 @@ class StockfishExplainer(Scene):
 
         self.play(FadeOut(cleanup), run_time=0.45)
 
+
 class EngineIntro(BaseSection):
     def show_alphazero_flowchart(self):
         # A clearer AlphaZero loop:
@@ -584,7 +583,7 @@ class EngineIntro(BaseSection):
         # 4) Train the net to match pi and predict z
         # 5) Repeat
 
-        center = 2 * LEFT + DOWN * 0.6
+        center = ORIGIN
 
         boxes = [
             RoundedRectangle(width=3.6, height=1.05, corner_radius=0.25)
@@ -602,13 +601,15 @@ class EngineIntro(BaseSection):
         ]
 
         texts = [
-            Paragraph("Neural net", "(policy + value)", font_size=32, alignment="center")
-            .scale(0.5),
-            Paragraph("Self-play", "using MCTS", font_size=32, alignment="center").scale(
-                0.5
-            ),
-            Paragraph("Training targets", "(π, z)", font_size=32, alignment="center")
-            .scale(0.5),
+            Paragraph(
+                "Neural net", "(policy + value)", font_size=32, alignment="center"
+            ).scale(0.5),
+            Paragraph(
+                "Self-play", "using MCTS", font_size=32, alignment="center"
+            ).scale(0.5),
+            Paragraph(
+                "Training targets", "(π, z)", font_size=32, alignment="center"
+            ).scale(0.5),
             Paragraph(
                 "Update the net", "to match π and z", font_size=32, alignment="center"
             ).scale(0.5),
@@ -676,7 +677,7 @@ class EngineIntro(BaseSection):
             tokens.add(box)
 
         tokens.arrange(RIGHT, buff=0.4)
-        tokens.to_edge(UP).shift(2 * DOWN)
+        tokens.to_edge(UP).shift(2.5 * DOWN)
 
         input_label = Text("Input tokens", font_size=32).scale(0.5).next_to(tokens, UP)
 
@@ -772,9 +773,9 @@ class EngineIntro(BaseSection):
                 text_obj.scale_to_fit_width(max_width)
             return text_obj
 
-        top_text = Paragraph("There are 2 main types of chess engines", font_size=30).to_edge(
-            UP
-        )
+        top_text = Paragraph(
+            "There are 2 main types of chess engines", font_size=30
+        ).to_edge(UP)
 
         self.play(Write(top_text))
         self.wait(1.2)
@@ -807,7 +808,7 @@ class EngineIntro(BaseSection):
         ).next_to(top_text, DOWN)
         fit_paragraph(body_text)
         self.play(Write(body_text))
-        self.wait(1.8)
+        self.wait(3)
 
         new_text = Paragraph(
             "During play, it uses Monte Carlo Tree Search (MCTS):",
@@ -818,7 +819,7 @@ class EngineIntro(BaseSection):
         ).next_to(top_text, DOWN)
         fit_paragraph(new_text)
         self.play(Transform(body_text, new_text))
-        self.wait(1.8)
+        self.wait(3)
 
         new_text = Paragraph(
             "Training is a loop:",
@@ -830,7 +831,8 @@ class EngineIntro(BaseSection):
         ).next_to(top_text, DOWN)
         fit_paragraph(new_text)
         self.play(Transform(body_text, new_text))
-        self.wait(1.4)
+        self.wait(2)
+        self.play(FadeOut(body_text))
 
         self.show_alphazero_flowchart()
 
@@ -838,8 +840,9 @@ class EngineIntro(BaseSection):
 
         # Transformer bridge (kept: your original section but slightly clearer)
         body_text = Paragraph(
-            "Neural networks often use transformers — the same general architecture",
-            "used in large language models — to build strong representations from input tokens.",
+            "Neural networks often use transformers — the same",
+            "general architecture used in large language models",
+            " — to build strong representations from input tokens.",
             font_size=30,
         ).next_to(top_text, DOWN)
         self.play(Write(body_text))
