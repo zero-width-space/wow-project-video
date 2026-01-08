@@ -42,6 +42,15 @@ class StockfishExplainer(Scene):
             run_time=0.6,
             rate_func=rate_functions.ease_in_out_cubic,
         )
+        body_text = Paragraph(
+            "This is an algorithm known as AB pruning, or alpha-beta",
+            "pruning, which is used by engines like Stockfish to cut down",
+            "on the number of positions to search",
+            font_size=32,
+        )
+        self.play(Write(body_text))
+        self.wait()
+        self.play(FadeOut(body_text))
 
         # =============================
         # 2) CHESS BOARD (SVG) + FEATURE SWEEP + EVAL BAR
@@ -804,7 +813,6 @@ class EngineIntro(BaseSection):
             "The network outputs two things:",
             "policy = likely moves, value = how good the position is.",
             font_size=28,
-            line_spacing=0.9,
         ).next_to(top_text, DOWN)
         fit_paragraph(body_text)
         self.play(Write(body_text))
@@ -815,7 +823,6 @@ class EngineIntro(BaseSection):
             "simulate a few futures, guided by the network,",
             "then pick the move that looks best.",
             font_size=28,
-            line_spacing=0.9,
         ).next_to(top_text, DOWN)
         fit_paragraph(new_text)
         self.play(Transform(body_text, new_text))
@@ -827,7 +834,6 @@ class EngineIntro(BaseSection):
             "then the network is updated to match the search",
             "and the final game result. Repeat.",
             font_size=28,
-            line_spacing=0.9,
         ).next_to(top_text, DOWN)
         fit_paragraph(new_text)
         self.play(Transform(body_text, new_text))

@@ -70,13 +70,11 @@ def small_label(text: str, size=22, opacity=0.9) -> Text:
     return Text(text, font_size=size).set_opacity(opacity).set_color(WHITE)
 
 
-def box(text: str, w=3.8, h=1.0, color=GREY_D, size=24, line_spacing=0.9) -> VGroup:
+def box(text: str, w=3.8, h=1.0, color=GREY_D, size=24) -> VGroup:
     r = RoundedRectangle(corner_radius=0.22, width=w, height=h)
     r.set_fill(color, opacity=1.0)
     r.set_stroke(width=0)
-    tx = Text(text, font_size=size, weight=BOLD, line_spacing=line_spacing).set_color(
-        WHITE
-    )
+    tx = Text(text, font_size=size, weight=BOLD).set_color(WHITE)
     tx.move_to(r.get_center())
     return VGroup(r, tx)
 
@@ -246,7 +244,9 @@ def marks_for_board(grid_squares: VGroup, chars64: str) -> VGroup:
     for i, ch in enumerate(chars64):
         # show ALL 64: pieces as HI, empties as subtle dots
         if ch == ".":
-            tx = Text(".", font_size=16, weight=BOLD).set_color(GREY_A).set_opacity(0.55)
+            tx = (
+                Text(".", font_size=16, weight=BOLD).set_color(GREY_A).set_opacity(0.55)
+            )
         else:
             tx = Text(ch, font_size=18, weight=BOLD).set_color(HI).set_opacity(0.95)
         tx.move_to(grid_squares[i].get_center())
@@ -593,10 +593,14 @@ class ChessTransformer(Scene):
         prom_txt.next_to(act_txt, DOWN, buff=0.22).align_to(act_txt, LEFT)
 
         self.play(FadeIn(seq, shift=DOWN), run_time=T["reveal"])
-        self.play(FadeIn(eq79, shift=UP), FadeIn(cls_note, shift=UP), run_time=T["fade"])
+        self.play(
+            FadeIn(eq79, shift=UP), FadeIn(cls_note, shift=UP), run_time=T["fade"]
+        )
         self.wait(T["hold_short"])
 
-        self.play(FadeIn(mini, scale=0.98), FadeIn(origin, scale=0.95), run_time=T["fade"])
+        self.play(
+            FadeIn(mini, scale=0.98), FadeIn(origin, scale=0.95), run_time=T["fade"]
+        )
         self.play(
             LaggedStart(*[Create(l) for l in rays], lag_ratio=0.06),
             run_time=T["reveal"],
@@ -605,7 +609,11 @@ class ChessTransformer(Scene):
             LaggedStart(*[FadeIn(d, scale=0.9) for d in kdots], lag_ratio=0.05),
             run_time=T["reveal"],
         )
-        self.play(FadeIn(act_txt, shift=LEFT), FadeIn(prom_txt, shift=LEFT), run_time=T["reveal"])
+        self.play(
+            FadeIn(act_txt, shift=LEFT),
+            FadeIn(prom_txt, shift=LEFT),
+            run_time=T["reveal"],
+        )
         self.wait(T["hold_long"])
 
         self.play(
@@ -655,7 +663,9 @@ class ChessTransformer(Scene):
         mat_lab.move_to(mat.get_center())
         mat_g = VGroup(mat, mat_lab).move_to(RIGHT * 3.7 + DOWN * 1.75)
 
-        down = Arrow(vec.get_bottom(), mat_g.get_top(), buff=0.25, stroke_width=5).set_color(WHITE)
+        down = Arrow(
+            vec.get_bottom(), mat_g.get_top(), buff=0.25, stroke_width=5
+        ).set_color(WHITE)
 
         self.play(FadeIn(tok_ids, shift=RIGHT), run_time=T["fade"])
         self.play(FadeIn(emb, shift=RIGHT), Create(a1), run_time=T["reveal"])
@@ -739,7 +749,9 @@ class ChessTransformer(Scene):
         )
 
         # Heatmap and equation: keep separated (no overlaps)
-        hm = Heatmap5(cell=0.34).set_weights([[0.05] * 5 for _ in range(5)], color=ACCENT)
+        hm = Heatmap5(cell=0.34).set_weights(
+            [[0.05] * 5 for _ in range(5)], color=ACCENT
+        )
         hm_lab = small_label("attention weights (softmax)", 22)
         hm_group = VGroup(hm_lab, hm).arrange(DOWN, buff=0.12)
 
@@ -748,9 +760,9 @@ class ChessTransformer(Scene):
             font_size=36,
         ).set_color(WHITE)
 
-        out_vecs = VGroup(*[VectorBar("512", height=1.75, color=ACCENT) for _ in range(5)]).arrange(
-            RIGHT, buff=0.32
-        )
+        out_vecs = VGroup(
+            *[VectorBar("512", height=1.75, color=ACCENT) for _ in range(5)]
+        ).arrange(RIGHT, buff=0.32)
         out_lab = small_label("output token vectors (mixed info)", 22)
         out_group = VGroup(out_lab, out_vecs).arrange(DOWN, buff=0.12)
 
@@ -764,7 +776,10 @@ class ChessTransformer(Scene):
         weights1 = [0.10, 0.18, 0.42, 0.25]  # corresponds to arrows order (t1,t2,t4,t5)
         for ar, w in zip(arrows, weights1):
             ar.set_stroke(ACCENT, opacity=0.18 + 0.60 * w, width=2 + 10 * w)
-        self.play(LaggedStart(*[FadeIn(ar) for ar in arrows], lag_ratio=0.06), run_time=T["reveal"])
+        self.play(
+            LaggedStart(*[FadeIn(ar) for ar in arrows], lag_ratio=0.06),
+            run_time=T["reveal"],
+        )
 
         self.play(FadeIn(hm_group, shift=LEFT), run_time=T["reveal"])
         wmat1 = [
@@ -807,8 +822,10 @@ class ChessTransformer(Scene):
         # ------------------------------------------------------------
         # Multi-head: FIX overlap (h1.. labels no longer cover equation)
         # ------------------------------------------------------------
-        mh_title = Text("Multi-head: split 512 dims into 8 heads", font_size=34, weight=BOLD).set_color(WHITE).set_opacity(
-            0.95
+        mh_title = (
+            Text("Multi-head: split 512 dims into 8 heads", font_size=34, weight=BOLD)
+            .set_color(WHITE)
+            .set_opacity(0.95)
         )
         mh_title.move_to(UP * 3.05)
         mh_eq = MathTex(r"512 = 8 \times 64", font_size=56).set_color(HI)
@@ -823,33 +840,68 @@ class ChessTransformer(Scene):
         slices.arrange(RIGHT, buff=0.10).move_to(UP * 1.25)
 
         head_labs = VGroup(
-            *[Text(f"h{i+1}", font_size=20, weight=BOLD).set_color(WHITE) for i in range(8)]
+            *[
+                Text(f"h{i+1}", font_size=20, weight=BOLD).set_color(WHITE)
+                for i in range(8)
+            ]
         ).arrange(RIGHT, buff=0.33)
         head_labs.next_to(slices, DOWN, buff=0.18)
 
-        self.play(FadeIn(mh_title, shift=DOWN), FadeIn(mh_eq, shift=DOWN), run_time=T["reveal"])
-        self.play(FadeIn(slices, shift=UP), FadeIn(head_labs, shift=UP), run_time=T["reveal"])
+        self.play(
+            FadeIn(mh_title, shift=DOWN),
+            FadeIn(mh_eq, shift=DOWN),
+            run_time=T["reveal"],
+        )
+        self.play(
+            FadeIn(slices, shift=UP), FadeIn(head_labs, shift=UP), run_time=T["reveal"]
+        )
         self.wait(T["hold_short"])
-        self.play(FadeOut(mh_title), FadeOut(mh_eq), FadeOut(slices), FadeOut(head_labs), run_time=T["fade"])
+        self.play(
+            FadeOut(mh_title),
+            FadeOut(mh_eq),
+            FadeOut(slices),
+            FadeOut(head_labs),
+            run_time=T["fade"],
+        )
 
         # ------------------------------------------------------------
         # SwiGLU MLP: FIX title overlap with blocks
         # ------------------------------------------------------------
-        mlp_title = Text(
-            "MLP (SwiGLU): expand, split, gate, project back",
-            font_size=34,
-            weight=BOLD,
-        ).set_color(WHITE).set_opacity(0.95)
+        mlp_title = (
+            Text(
+                "MLP (SwiGLU): expand, split, gate, project back",
+                font_size=34,
+                weight=BOLD,
+            )
+            .set_color(WHITE)
+            .set_opacity(0.95)
+        )
         mlp_title.move_to(UP * 3.05)
 
-        v512 = VectorBar("512", height=2.25, color=ACCENT).move_to(LEFT * 5.4 + DOWN * 0.20)
-        v8192 = VectorBar("4096×2", height=2.95, color=ACCENT2).move_to(LEFT * 2.8 + DOWN * 0.20)
-        u = VectorBar("4096 (u)", height=2.75, color=ACCENT2).move_to(RIGHT * 0.05 + DOWN * 0.20)
-        vv = VectorBar("4096 (v)", height=2.75, color=ACCENT2).move_to(RIGHT * 2.05 + DOWN * 0.20)
+        v512 = VectorBar("512", height=2.25, color=ACCENT).move_to(
+            LEFT * 5.4 + DOWN * 0.20
+        )
+        v8192 = VectorBar("4096×2", height=2.95, color=ACCENT2).move_to(
+            LEFT * 2.8 + DOWN * 0.20
+        )
+        u = VectorBar("4096 (u)", height=2.75, color=ACCENT2).move_to(
+            RIGHT * 0.05 + DOWN * 0.20
+        )
+        vv = VectorBar("4096 (v)", height=2.75, color=ACCENT2).move_to(
+            RIGHT * 2.05 + DOWN * 0.20
+        )
 
-        mul = Text("silu(u) ⊙ v", font_size=30, weight=BOLD).set_color(HI).move_to(RIGHT * 4.25 + UP * 0.35)
-        v2048 = VectorBar("2048", height=2.50, color=ACCENT2).move_to(RIGHT * 4.25 + DOWN * 1.05)
-        back = VectorBar("512", height=2.25, color=ACCENT).move_to(RIGHT * 5.85 + DOWN * 0.20)
+        mul = (
+            Text("silu(u) ⊙ v", font_size=30, weight=BOLD)
+            .set_color(HI)
+            .move_to(RIGHT * 4.25 + UP * 0.35)
+        )
+        v2048 = VectorBar("2048", height=2.50, color=ACCENT2).move_to(
+            RIGHT * 4.25 + DOWN * 1.05
+        )
+        back = VectorBar("512", height=2.25, color=ACCENT).move_to(
+            RIGHT * 5.85 + DOWN * 0.20
+        )
 
         a_m1 = arrow_lr(v512, v8192, buff=0.25)
         a_m2 = arrow_lr(v8192, u, buff=0.25)
@@ -862,11 +914,27 @@ class ChessTransformer(Scene):
 
         self.play(FadeIn(mlp_title, shift=DOWN), run_time=T["fade"])
         self.play(FadeIn(v512, shift=RIGHT), run_time=T["fade"])
-        self.play(Create(a_m1), FadeIn(v8192, shift=LEFT), FadeIn(fc1, shift=DOWN), run_time=T["reveal"])
-        self.play(Create(a_m2), FadeIn(u, shift=LEFT), FadeIn(vv, shift=LEFT), FadeIn(split2, shift=DOWN), run_time=T["reveal"])
+        self.play(
+            Create(a_m1),
+            FadeIn(v8192, shift=LEFT),
+            FadeIn(fc1, shift=DOWN),
+            run_time=T["reveal"],
+        )
+        self.play(
+            Create(a_m2),
+            FadeIn(u, shift=LEFT),
+            FadeIn(vv, shift=LEFT),
+            FadeIn(split2, shift=DOWN),
+            run_time=T["reveal"],
+        )
         self.play(FadeIn(mul, shift=UP), run_time=T["fade"])
         self.play(Create(a_m4), FadeIn(v2048, shift=UP), run_time=T["reveal"])
-        self.play(Create(a_m5), FadeIn(back, shift=LEFT), FadeIn(proj, shift=DOWN), run_time=T["reveal"])
+        self.play(
+            Create(a_m5),
+            FadeIn(back, shift=LEFT),
+            FadeIn(proj, shift=DOWN),
+            run_time=T["reveal"],
+        )
         self.wait(T["hold_short"])
 
         self.play(
@@ -903,8 +971,16 @@ class ChessTransformer(Scene):
         ).arrange(DOWN, buff=0.18)
         cfg.move_to(LEFT * 4.8 + DOWN * 0.1)
 
-        blk = RoundedRectangle(corner_radius=0.16, width=4.9, height=0.55).set_fill(GREY_D, 1.0).set_stroke(width=0)
-        blk_lab = Text("Transformer layer", font_size=24, weight=BOLD).set_color(WHITE).move_to(blk.get_center())
+        blk = (
+            RoundedRectangle(corner_radius=0.16, width=4.9, height=0.55)
+            .set_fill(GREY_D, 1.0)
+            .set_stroke(width=0)
+        )
+        blk_lab = (
+            Text("Transformer layer", font_size=24, weight=BOLD)
+            .set_color(WHITE)
+            .move_to(blk.get_center())
+        )
         one = VGroup(blk, blk_lab)
         stack = VGroup(*[one.copy() for _ in range(4)]).arrange(DOWN, buff=0.16)
         stack.move_to(LEFT * 0.3 + UP * 0.95)
@@ -913,19 +989,31 @@ class ChessTransformer(Scene):
         times = Text("×12", font_size=34, weight=BOLD).set_color(HI)
         times.next_to(br, RIGHT, buff=0.14)
 
-        cls = chip("CLS = summary token (last position)", GREY_D, 22).next_to(
-            stack, DOWN, buff=0.45
-        ).align_to(stack, LEFT)
+        cls = (
+            chip("CLS = summary token (last position)", GREY_D, 22)
+            .next_to(stack, DOWN, buff=0.45)
+            .align_to(stack, LEFT)
+        )
 
-        cls_vec = VectorBar("CLS (512)", height=2.2, color=HI).next_to(
-            stack, RIGHT, buff=0.55
-        ).shift(DOWN * 0.15)
+        cls_vec = (
+            VectorBar("CLS (512)", height=2.2, color=HI)
+            .next_to(stack, RIGHT, buff=0.55)
+            .shift(DOWN * 0.15)
+        )
         a_cls = arrow_lr(stack, cls_vec, buff=0.25)
 
         heads = VGroup(
-            box("Policy head\n→ 1968 move logits", w=2.9, h=0.95, color=ACCENT2, size=21),
+            box(
+                "Policy head\n→ 1968 move logits", w=2.9, h=0.95, color=ACCENT2, size=21
+            ),
             box("Value head\n→ 128 win% buckets", w=2.9, h=0.95, color=ACCENT, size=21),
-            box("Action-value head\n→ 128 win% buckets", w=2.9, h=0.95, color=ACCENT2, size=21),
+            box(
+                "Action-value head\n→ 128 win% buckets",
+                w=2.9,
+                h=0.95,
+                color=ACCENT2,
+                size=21,
+            ),
         ).arrange(DOWN, buff=0.22)
         heads.next_to(cls_vec, RIGHT, buff=0.45).shift(DOWN * 0.10)
 
@@ -941,10 +1029,19 @@ class ChessTransformer(Scene):
             bucket_note.next_to(heads, DOWN, buff=0.18).align_to(heads, LEFT)
 
         self.play(FadeIn(cfg, shift=RIGHT), run_time=T["reveal"])
-        self.play(FadeIn(stack, shift=UP), FadeIn(br), FadeIn(times, shift=LEFT), run_time=T["reveal"])
+        self.play(
+            FadeIn(stack, shift=UP),
+            FadeIn(br),
+            FadeIn(times, shift=LEFT),
+            run_time=T["reveal"],
+        )
         self.play(FadeIn(cls, shift=UP), run_time=T["fade"])
         self.play(Create(a_cls), FadeIn(cls_vec, shift=LEFT), run_time=T["reveal"])
-        self.play(FadeIn(heads, shift=LEFT), FadeIn(head_arrows, shift=LEFT), run_time=T["reveal"])
+        self.play(
+            FadeIn(heads, shift=LEFT),
+            FadeIn(head_arrows, shift=LEFT),
+            run_time=T["reveal"],
+        )
         self.play(FadeIn(bucket_note, shift=UP), run_time=T["fade"])
         self.wait(T["hold_long"])
 
@@ -969,20 +1066,24 @@ class ChessTransformer(Scene):
         self.play(Transform(t0, t7), run_time=T["fade"])
 
         # Top pipeline row (kept high so it doesn't collide with plots)
-        rec = box("Dataset record:\n(FEN, move, win_prob)", w=4.5, h=1.25, color=ACCENT2, size=24).move_to(
-            LEFT * 4.9 + UP * 2.05
-        )
-        buck = box("bucketize win_prob\n→ bucket id", w=3.5, h=1.25, color=ACCENT, size=24).move_to(
-            LEFT * 0.9 + UP * 2.05
-        )
+        rec = box(
+            "Dataset record:\n(FEN, move, win_prob)",
+            w=4.5,
+            h=1.25,
+            color=ACCENT2,
+            size=24,
+        ).move_to(LEFT * 4.9 + UP * 2.05)
+        buck = box(
+            "bucketize win_prob\n→ bucket id", w=3.5, h=1.25, color=ACCENT, size=24
+        ).move_to(LEFT * 0.9 + UP * 2.05)
         buck_note = small_label("Bucket = a small win% range (0-1%, 1-2%, ...)", 20)
         buck_note.next_to(buck, DOWN, buff=0.10).align_to(buck, LEFT)
         if buck_note.width > (X_R - X_L - 0.4):
             buck_note.scale_to_fit_width(X_R - X_L - 0.4)
             buck_note.next_to(buck, DOWN, buff=0.10).align_to(buck, LEFT)
-        logits = box("model outputs\n128 logits", w=3.1, h=1.25, color=GREY_D, size=24).move_to(
-            RIGHT * 2.85 + UP * 2.05
-        )
+        logits = box(
+            "model outputs\n128 logits", w=3.1, h=1.25, color=GREY_D, size=24
+        ).move_to(RIGHT * 2.85 + UP * 2.05)
         a_rec = arrow_lr(rec, buck, buff=0.25)
         a_b = arrow_lr(buck, logits, buff=0.25)
 
@@ -998,7 +1099,9 @@ class ChessTransformer(Scene):
                 rct.set_stroke(width=0)
                 g.add(rct)
             g.arrange(RIGHT, buff=0.03, aligned_edge=DOWN)
-            frame = RoundedRectangle(corner_radius=0.12, width=width + 0.25, height=height + 0.25)
+            frame = RoundedRectangle(
+                corner_radius=0.12, width=width + 0.25, height=height + 0.25
+            )
             frame.set_stroke(WHITE, opacity=0.35, width=2)
             frame.set_fill(BLACK, opacity=0.0)
             g.move_to(frame.get_bottom() + UP * (0.12 + height / 2))
@@ -1010,12 +1113,24 @@ class ChessTransformer(Scene):
 
         tgt = bars(target_vals, ACCENT2, width=3.4, height=1.35)
         prd = bars(pred_vals_1, ACCENT, width=3.4, height=1.35)
-        tgt_lab = small_label("Gaussian target\n(sigma = 0.75)", 22).next_to(tgt, UP, buff=0.12).align_to(tgt, LEFT)
-        prd_lab = small_label("model softmax", 22).next_to(prd, UP, buff=0.12).align_to(prd, LEFT)
-        dists = VGroup(VGroup(tgt_lab, tgt), VGroup(prd_lab, prd)).arrange(RIGHT, buff=0.65)
+        tgt_lab = (
+            small_label("Gaussian target\n(sigma = 0.75)", 22)
+            .next_to(tgt, UP, buff=0.12)
+            .align_to(tgt, LEFT)
+        )
+        prd_lab = (
+            small_label("model softmax", 22)
+            .next_to(prd, UP, buff=0.12)
+            .align_to(prd, LEFT)
+        )
+        dists = VGroup(VGroup(tgt_lab, tgt), VGroup(prd_lab, prd)).arrange(
+            RIGHT, buff=0.65
+        )
         dists.move_to(LEFT * 1.05 + DOWN * 0.05)
 
-        ce = MathTex(r"\mathcal{L}=-\sum_b p_{tgt}(b)\log p_\theta(b)", font_size=40).set_color(WHITE)
+        ce = MathTex(
+            r"\mathcal{L}=-\sum_b p_{tgt}(b)\log p_\theta(b)", font_size=40
+        ).set_color(WHITE)
         ce.move_to(LEFT * 1.10 + DOWN * 2.55)
 
         # LR schedule visual (right side) — dot moves along the curve path
@@ -1028,7 +1143,9 @@ class ChessTransformer(Scene):
         )
         ax.set_stroke(opacity=0.40)
         xlab = small_label("training progress", 20).next_to(ax, DOWN, buff=0.12)
-        ylab = small_label("learning rate", 20).next_to(ax, LEFT, buff=0.12).rotate(PI / 2)
+        ylab = (
+            small_label("learning rate", 20).next_to(ax, LEFT, buff=0.12).rotate(PI / 2)
+        )
 
         def lr_func(x):
             if x < 0.18:
@@ -1041,7 +1158,9 @@ class ChessTransformer(Scene):
         dot.move_to(curve.point_from_proportion(0.0))
 
         lr_title = small_label("warmup + cosine decay", 22)
-        lr_g = VGroup(lr_title, VGroup(ax, xlab, ylab, curve, dot)).arrange(DOWN, buff=0.10)
+        lr_g = VGroup(lr_title, VGroup(ax, xlab, ylab, curve, dot)).arrange(
+            DOWN, buff=0.10
+        )
         lr_g.move_to(RIGHT * 4.35 + DOWN * 1.05)
 
         runchips = VGroup(
@@ -1051,13 +1170,20 @@ class ChessTransformer(Scene):
         runchips.next_to(lr_g, UP, buff=0.25).align_to(lr_g, LEFT)
 
         self.play(FadeIn(rec, shift=RIGHT), run_time=T["fade"])
-        self.play(FadeIn(buck, shift=RIGHT), FadeIn(buck_note, shift=UP), Create(a_rec), run_time=T["reveal"])
+        self.play(
+            FadeIn(buck, shift=RIGHT),
+            FadeIn(buck_note, shift=UP),
+            Create(a_rec),
+            run_time=T["reveal"],
+        )
         self.play(FadeIn(logits, shift=RIGHT), Create(a_b), run_time=T["reveal"])
         self.wait(0.3)
 
         self.play(FadeIn(dists, shift=UP), run_time=T["reveal"])
         self.play(Write(ce), run_time=T["reveal"])
-        self.play(FadeIn(lr_g, shift=UP), FadeIn(runchips, shift=DOWN), run_time=T["reveal"])
+        self.play(
+            FadeIn(lr_g, shift=UP), FadeIn(runchips, shift=DOWN), run_time=T["reveal"]
+        )
 
         # move dot ALONG the curve (no off-curve drift)
         self.play(MoveAlongPath(dot, curve, rate_func=linear), run_time=3.6)
@@ -1089,34 +1215,62 @@ class ChessTransformer(Scene):
         t8 = title("Liquid Reasoning: trunk once, then a 6-step loop")
         self.play(Transform(t0, t8), run_time=T["fade"])
 
-        mem_title = small_label("memory = trunk outputs for non-CLS tokens", 26).move_to(UP * 2.55)
-        mem = VGroup(*[VectorBar("512", height=1.55, color=ACCENT2) for _ in range(6)]).arrange(RIGHT, buff=0.25)
+        mem_title = small_label(
+            "memory = trunk outputs for non-CLS tokens", 26
+        ).move_to(UP * 2.55)
+        mem = VGroup(
+            *[VectorBar("512", height=1.55, color=ACCENT2) for _ in range(6)]
+        ).arrange(RIGHT, buff=0.25)
         mem.move_to(UP * 1.55)
 
-        r = VectorBar("r (512)", height=2.75, color=ACCENT).move_to(LEFT * 5.25 + DOWN * 0.95)
+        r = VectorBar("r (512)", height=2.75, color=ACCENT).move_to(
+            LEFT * 5.25 + DOWN * 0.95
+        )
         r0_lab = small_label("r₀ = CLS", 22).next_to(r, UP, buff=0.12).align_to(r, LEFT)
 
         attn_lines = VGroup()
         for m in mem:
-            ln = Line(r.body.get_right(), m.body.get_left()).set_stroke(ACCENT, opacity=0.20, width=2)
+            ln = Line(r.body.get_right(), m.body.get_left()).set_stroke(
+                ACCENT, opacity=0.20, width=2
+            )
             attn_lines.add(ln)
 
         step_counter = Text("step 1 / 6", font_size=40, weight=BOLD).set_color(HI)
         step_counter.move_to(RIGHT * 5.05 + DOWN * 3.05)
 
         # Discard gate
-        dg_frame = RoundedRectangle(corner_radius=0.12, width=3.6, height=0.42).set_stroke(WHITE, opacity=0.35, width=2)
-        dg_fill = Rectangle(width=1.2, height=0.32).set_fill(WARN, opacity=0.85).set_stroke(width=0)
-        dg_fill.align_to(dg_frame, LEFT).move_to(dg_frame.get_left() + RIGHT * (dg_fill.width / 2))
-        dg_lab = small_label("discard gate d (1=keep old)", 22).next_to(dg_frame, UP, buff=0.12)
+        dg_frame = RoundedRectangle(
+            corner_radius=0.12, width=3.6, height=0.42
+        ).set_stroke(WHITE, opacity=0.35, width=2)
+        dg_fill = (
+            Rectangle(width=1.2, height=0.32)
+            .set_fill(WARN, opacity=0.85)
+            .set_stroke(width=0)
+        )
+        dg_fill.align_to(dg_frame, LEFT).move_to(
+            dg_frame.get_left() + RIGHT * (dg_fill.width / 2)
+        )
+        dg_lab = small_label("discard gate d (1=keep old)", 22).next_to(
+            dg_frame, UP, buff=0.12
+        )
         dg = VGroup(dg_lab, VGroup(dg_frame, dg_fill)).arrange(DOWN, buff=0.10)
         dg.move_to(RIGHT * 3.7 + DOWN * 1.10)
 
         # Stop gate
-        sg_frame = RoundedRectangle(corner_radius=0.12, width=3.6, height=0.42).set_stroke(WHITE, opacity=0.35, width=2)
-        sg_fill = Rectangle(width=0.6, height=0.32).set_fill(GOOD, opacity=0.85).set_stroke(width=0)
-        sg_fill.align_to(sg_frame, LEFT).move_to(sg_frame.get_left() + RIGHT * (sg_fill.width / 2))
-        sg_lab = small_label("stop prob s = sigmoid(stop_gate(r_new))", 22).next_to(sg_frame, UP, buff=0.12)
+        sg_frame = RoundedRectangle(
+            corner_radius=0.12, width=3.6, height=0.42
+        ).set_stroke(WHITE, opacity=0.35, width=2)
+        sg_fill = (
+            Rectangle(width=0.6, height=0.32)
+            .set_fill(GOOD, opacity=0.85)
+            .set_stroke(width=0)
+        )
+        sg_fill.align_to(sg_frame, LEFT).move_to(
+            sg_frame.get_left() + RIGHT * (sg_fill.width / 2)
+        )
+        sg_lab = small_label("stop prob s = sigmoid(stop_gate(r_new))", 22).next_to(
+            sg_frame, UP, buff=0.12
+        )
         thresh = Line(
             sg_frame.get_left() + RIGHT * (3.6 * 0.9),
             sg_frame.get_left() + RIGHT * (3.6 * 0.9) + UP * 0.42,
@@ -1133,10 +1287,17 @@ class ChessTransformer(Scene):
 
         self.play(FadeIn(mem_title, shift=DOWN), run_time=T["fade"])
         self.play(FadeIn(mem, shift=DOWN), run_time=T["reveal"])
-        self.play(FadeIn(r, shift=RIGHT), FadeIn(r0_lab, shift=UP), run_time=T["reveal"])
+        self.play(
+            FadeIn(r, shift=RIGHT), FadeIn(r0_lab, shift=UP), run_time=T["reveal"]
+        )
         self.play(FadeIn(attn_lines), run_time=T["fade"])
         self.play(FadeIn(params, shift=LEFT), run_time=T["fade"])
-        self.play(FadeIn(dg, shift=UP), FadeIn(sg, shift=UP), FadeIn(step_counter, shift=UP), run_time=T["reveal"])
+        self.play(
+            FadeIn(dg, shift=UP),
+            FadeIn(sg, shift=UP),
+            FadeIn(step_counter, shift=UP),
+            run_time=T["reveal"],
+        )
 
         attn_patterns = [
             [0.10, 0.15, 0.42, 0.12, 0.14, 0.07],
@@ -1150,29 +1311,51 @@ class ChessTransformer(Scene):
         stop_vals = [0.30, 0.45, 0.60, 0.72, 0.79, 0.79]
 
         for i in range(6):
-            new_counter = Text(f"step {i+1} / 6", font_size=40, weight=BOLD).set_color(HI)
+            new_counter = Text(f"step {i+1} / 6", font_size=40, weight=BOLD).set_color(
+                HI
+            )
             new_counter.move_to(step_counter.get_center())
 
             anims = [Transform(step_counter, new_counter)]
             for j, ln in enumerate(attn_lines):
                 w = attn_patterns[i][j]
-                anims.append(ln.animate.set_stroke(ACCENT, opacity=0.45, width=2 + 10 * w))
+                anims.append(
+                    ln.animate.set_stroke(ACCENT, opacity=0.45, width=2 + 10 * w)
+                )
 
             dw = 3.6 * discard_vals[i]
-            new_dfill = Rectangle(width=max(0.08, dw), height=0.32).set_fill(WARN, opacity=0.85).set_stroke(width=0)
-            new_dfill.align_to(dg_frame, LEFT).move_to(dg_frame.get_left() + RIGHT * (new_dfill.width / 2))
+            new_dfill = (
+                Rectangle(width=max(0.08, dw), height=0.32)
+                .set_fill(WARN, opacity=0.85)
+                .set_stroke(width=0)
+            )
+            new_dfill.align_to(dg_frame, LEFT).move_to(
+                dg_frame.get_left() + RIGHT * (new_dfill.width / 2)
+            )
             anims.append(Transform(dg_fill, new_dfill))
 
             sw = 3.6 * stop_vals[i]
-            new_sfill = Rectangle(width=max(0.08, sw), height=0.32).set_fill(GOOD, opacity=0.85).set_stroke(width=0)
-            new_sfill.align_to(sg_frame, LEFT).move_to(sg_frame.get_left() + RIGHT * (new_sfill.width / 2))
+            new_sfill = (
+                Rectangle(width=max(0.08, sw), height=0.32)
+                .set_fill(GOOD, opacity=0.85)
+                .set_stroke(width=0)
+            )
+            new_sfill.align_to(sg_frame, LEFT).move_to(
+                sg_frame.get_left() + RIGHT * (new_sfill.width / 2)
+            )
             anims.append(Transform(sg_fill, new_sfill))
 
             self.play(AnimationGroup(*anims, lag_ratio=0.02), run_time=1.15)
             self.wait(0.30)
 
-        lrt_takeaway = Text("Goal: harder positions should “use more steps”.", font_size=30, weight=BOLD).set_color(WHITE).set_opacity(
-            0.95
+        lrt_takeaway = (
+            Text(
+                "Goal: harder positions should “use more steps”.",
+                font_size=30,
+                weight=BOLD,
+            )
+            .set_color(WHITE)
+            .set_opacity(0.95)
         )
         lrt_takeaway.move_to(DOWN * 3.25)
         self.play(FadeIn(lrt_takeaway, shift=UP), run_time=T["fade"])
@@ -1199,37 +1382,66 @@ class ChessTransformer(Scene):
         t9 = title("Stop gate finetune (Lichess puzzles) — exactly your method")
         self.play(Transform(t0, t9), run_time=T["fade"])
 
-        pz = box("Puzzle batch", w=3.2, h=1.0, color=ACCENT2, size=26).move_to(LEFT * 5.4 + UP * 1.8)
-        runk = box("Run 6 steps\n(get r_hist, stop_logits)", w=4.3, h=1.2, color=GREY_D, size=24).move_to(
-            LEFT * 1.65 + UP * 1.8
+        pz = box("Puzzle batch", w=3.2, h=1.0, color=ACCENT2, size=26).move_to(
+            LEFT * 5.4 + UP * 1.8
         )
-        logp = box("Per-step log P(correct move)", w=4.6, h=1.0, color=ACCENT, size=24).move_to(RIGHT * 3.25 + UP * 1.8)
+        runk = box(
+            "Run 6 steps\n(get r_hist, stop_logits)",
+            w=4.3,
+            h=1.2,
+            color=GREY_D,
+            size=24,
+        ).move_to(LEFT * 1.65 + UP * 1.8)
+        logp = box(
+            "Per-step log P(correct move)", w=4.6, h=1.0, color=ACCENT, size=24
+        ).move_to(RIGHT * 3.25 + UP * 1.8)
 
         a_p = arrow_lr(pz, runk, buff=0.25)
         a_r = arrow_lr(runk, logp, buff=0.25)
 
-        steps = VGroup(*[Text(str(i + 1), font_size=22, weight=BOLD).set_color(WHITE) for i in range(6)]).arrange(
-            RIGHT, buff=0.55
-        )
+        steps = VGroup(
+            *[
+                Text(str(i + 1), font_size=22, weight=BOLD).set_color(WHITE)
+                for i in range(6)
+            ]
+        ).arrange(RIGHT, buff=0.55)
         steps.move_to(LEFT * 1.65 + DOWN * 0.40)
 
         vals = [0.35, 0.55, 0.68, 0.72, 0.71, 0.71]
         bars_v = VGroup()
         for i, v in enumerate(vals):
-            rct = Rectangle(width=0.30, height=0.20 + 1.55 * v).set_fill(ACCENT, 0.80).set_stroke(width=0)
+            rct = (
+                Rectangle(width=0.30, height=0.20 + 1.55 * v)
+                .set_fill(ACCENT, 0.80)
+                .set_stroke(width=0)
+            )
             rct.align_to(steps[i], DOWN).shift(UP * 0.20)
             bars_v.add(rct)
 
         chart = VGroup(steps, bars_v).move_to(DOWN * 0.65 + LEFT * 1.65)
-        chart_lab = small_label("log P(correct move) at each reasoning step", 22).next_to(chart, UP, buff=0.16).align_to(chart, LEFT)
+        chart_lab = (
+            small_label("log P(correct move) at each reasoning step", 22)
+            .next_to(chart, UP, buff=0.16)
+            .align_to(chart, LEFT)
+        )
 
-        pick = SurroundingRectangle(VGroup(steps[2], bars_v[2]), buff=0.18).set_stroke(HI, width=4)
-        tstar = Text("t* = 3", font_size=34, weight=BOLD).set_color(HI).next_to(pick, RIGHT, buff=0.25)
+        pick = SurroundingRectangle(VGroup(steps[2], bars_v[2]), buff=0.18).set_stroke(
+            HI, width=4
+        )
+        tstar = (
+            Text("t* = 3", font_size=34, weight=BOLD)
+            .set_color(HI)
+            .next_to(pick, RIGHT, buff=0.25)
+        )
 
-        rule = Text(
-            "choose_t_star:\n• take best step\n• allow step 1 only if near-best AND confident (p0 ≥ 0.75)\n• clamp to min_steps=1",
-            font_size=24,
-        ).set_color(WHITE).set_opacity(0.92)
+        rule = (
+            Text(
+                "choose_t_star:\n• take best step\n• allow step 1 only if near-best AND confident (p0 ≥ 0.75)\n• clamp to min_steps=1",
+                font_size=24,
+            )
+            .set_color(WHITE)
+            .set_opacity(0.92)
+        )
         rule.move_to(RIGHT * 3.55 + DOWN * 0.55)
 
         params2 = VGroup(
@@ -1240,9 +1452,19 @@ class ChessTransformer(Scene):
         ).arrange(DOWN, buff=0.10)
         params2.move_to(RIGHT * 4.8 + DOWN * 2.55)
 
-        yrow = token_row(["0", "0", "1", "1", "1", "1"], w=0.50, h=0.38, size=20, buff=0.10)
-        ylab = small_label("stop targets y_t = 1 for t ≥ t*", 22).next_to(yrow, UP, buff=0.12).align_to(yrow, LEFT)
-        y = VGroup(ylab, yrow).arrange(DOWN, buff=0.10).move_to(LEFT * 1.65 + DOWN * 2.60)
+        yrow = token_row(
+            ["0", "0", "1", "1", "1", "1"], w=0.50, h=0.38, size=20, buff=0.10
+        )
+        ylab = (
+            small_label("stop targets y_t = 1 for t ≥ t*", 22)
+            .next_to(yrow, UP, buff=0.12)
+            .align_to(yrow, LEFT)
+        )
+        y = (
+            VGroup(ylab, yrow)
+            .arrange(DOWN, buff=0.10)
+            .move_to(LEFT * 1.65 + DOWN * 2.60)
+        )
 
         bce = MathTex(
             r"\mathcal{L}=\mathrm{BCEWithLogits}(\text{stop\_logits}, y) + \lambda(1-\sigma(\text{stop\_logits}))",
@@ -1253,17 +1475,25 @@ class ChessTransformer(Scene):
         self.play(FadeIn(pz, shift=RIGHT), run_time=T["fade"])
         self.play(FadeIn(runk, shift=RIGHT), Create(a_p), run_time=T["reveal"])
         self.play(FadeIn(logp, shift=RIGHT), Create(a_r), run_time=T["reveal"])
-        self.play(FadeIn(chart_lab, shift=DOWN), FadeIn(chart, shift=UP), run_time=T["reveal"])
+        self.play(
+            FadeIn(chart_lab, shift=DOWN), FadeIn(chart, shift=UP), run_time=T["reveal"]
+        )
         self.play(Create(pick), FadeIn(tstar, shift=LEFT), run_time=T["fade"])
-        self.play(FadeIn(rule, shift=UP), FadeIn(params2, shift=UP), run_time=T["reveal"])
+        self.play(
+            FadeIn(rule, shift=UP), FadeIn(params2, shift=UP), run_time=T["reveal"]
+        )
         self.play(FadeIn(y, shift=UP), Write(bce), run_time=T["reveal"])
         self.wait(T["hold_short"])
 
-        merge = Text(
-            "Then you copied these stop-gate weights into your main checkpoint.",
-            font_size=30,
-            weight=BOLD,
-        ).set_color(WHITE).set_opacity(0.95)
+        merge = (
+            Text(
+                "Then you copied these stop-gate weights into your main checkpoint.",
+                font_size=30,
+                weight=BOLD,
+            )
+            .set_color(WHITE)
+            .set_opacity(0.95)
+        )
         merge.move_to(DOWN * 3.25)
         self.play(FadeIn(merge, shift=UP), run_time=T["fade"])
         self.wait(T["hold_short"])
@@ -1292,14 +1522,26 @@ class ChessTransformer(Scene):
         t10 = title("What you observed: step 1 ≈ step 6")
         self.play(Transform(t0, t10), run_time=T["fade"])
 
-        left = box("Use step 1", w=3.0, h=1.0, color=GREY_D, size=26).move_to(LEFT * 3.2 + UP * 1.0)
-        right = box("Use step 6", w=3.0, h=1.0, color=GREY_D, size=26).move_to(RIGHT * 3.2 + UP * 1.0)
+        left = box("Use step 1", w=3.0, h=1.0, color=GREY_D, size=26).move_to(
+            LEFT * 3.2 + UP * 1.0
+        )
+        right = box("Use step 6", w=3.0, h=1.0, color=GREY_D, size=26).move_to(
+            RIGHT * 3.2 + UP * 1.0
+        )
         approx = MathTex(r"\approx", font_size=90).set_color(HI).move_to(UP * 1.0)
 
         def strength_bar(x, y, wfill=2.8):
-            frame = RoundedRectangle(corner_radius=0.12, width=3.4, height=0.5).set_stroke(WHITE, opacity=0.35, width=2)
-            fill = Rectangle(width=wfill, height=0.36).set_fill(ACCENT, opacity=0.85).set_stroke(width=0)
-            fill.align_to(frame, LEFT).move_to(frame.get_left() + RIGHT * (fill.width / 2))
+            frame = RoundedRectangle(
+                corner_radius=0.12, width=3.4, height=0.5
+            ).set_stroke(WHITE, opacity=0.35, width=2)
+            fill = (
+                Rectangle(width=wfill, height=0.36)
+                .set_fill(ACCENT, opacity=0.85)
+                .set_stroke(width=0)
+            )
+            fill.align_to(frame, LEFT).move_to(
+                frame.get_left() + RIGHT * (fill.width / 2)
+            )
             lab = small_label("measured strength", 22).next_to(frame, UP, buff=0.12)
             g = VGroup(lab, VGroup(frame, fill)).arrange(DOWN, buff=0.10)
             g.move_to(x * RIGHT + y * UP)
@@ -1308,18 +1550,35 @@ class ChessTransformer(Scene):
         barL = strength_bar(-3.2, -0.6, wfill=2.75)
         barR = strength_bar(3.2, -0.6, wfill=2.75)
 
-        msg = Text(
-            "In your testing, enabling LRT didn’t change results.\nSo the reasoning loop likely wasn’t taking effect.",
-            font_size=30,
-            weight=BOLD,
-        ).set_opacity(0.95).move_to(DOWN * 2.65)
+        msg = (
+            Text(
+                "In your testing, enabling LRT didn’t change results.\nSo the reasoning loop likely wasn’t taking effect.",
+                font_size=30,
+                weight=BOLD,
+            )
+            .set_opacity(0.95)
+            .move_to(DOWN * 2.65)
+        )
 
-        self.play(FadeIn(left, shift=DOWN), FadeIn(right, shift=DOWN), FadeIn(approx), run_time=T["reveal"])
+        self.play(
+            FadeIn(left, shift=DOWN),
+            FadeIn(right, shift=DOWN),
+            FadeIn(approx),
+            run_time=T["reveal"],
+        )
         self.play(FadeIn(barL, shift=UP), FadeIn(barR, shift=UP), run_time=T["reveal"])
         self.play(FadeIn(msg, shift=UP), run_time=T["reveal"])
         self.wait(T["hold_short"])
 
-        self.play(FadeOut(left), FadeOut(right), FadeOut(approx), FadeOut(barL), FadeOut(barR), FadeOut(msg), run_time=T["fade"])
+        self.play(
+            FadeOut(left),
+            FadeOut(right),
+            FadeOut(approx),
+            FadeOut(barL),
+            FadeOut(barR),
+            FadeOut(msg),
+            run_time=T["fade"],
+        )
 
         # ------------------------------------------------------------
         # 11) Evaluation: REPLACE Elo curve with puzzle accuracy graph + Elo note
@@ -1329,12 +1588,59 @@ class ChessTransformer(Scene):
 
         # Data provided by you
         ranges = [
-            "200-399", "400-599", "600-799", "800-999", "1000-1199", "1200-1399",
-            "1400-1599", "1600-1799", "1800-1999", "2000-2199", "2200-2399", "2400-2599",
-            "2600-2799", "2800-2999", "3000-3199", "3200-3399",
+            "200-399",
+            "400-599",
+            "600-799",
+            "800-999",
+            "1000-1199",
+            "1200-1399",
+            "1400-1599",
+            "1600-1799",
+            "1800-1999",
+            "2000-2199",
+            "2200-2399",
+            "2400-2599",
+            "2600-2799",
+            "2800-2999",
+            "3000-3199",
+            "3200-3399",
         ]
-        first = [0.9667, 0.9667, 0.8600, 0.7200, 0.8000, 0.7333, 0.6200, 0.6000, 0.4800, 0.5400, 0.4667, 0.5400, 0.5000, 0.4000, 0.4800, 0.5000]
-        full =  [0.9667, 0.9667, 0.8000, 0.7000, 0.6800, 0.7000, 0.5200, 0.4000, 0.3400, 0.3000, 0.2333, 0.0800, 0.0400, 0.0000, 0.0200, 0.0833]
+        first = [
+            0.9667,
+            0.9667,
+            0.8600,
+            0.7200,
+            0.8000,
+            0.7333,
+            0.6200,
+            0.6000,
+            0.4800,
+            0.5400,
+            0.4667,
+            0.5400,
+            0.5000,
+            0.4000,
+            0.4800,
+            0.5000,
+        ]
+        full = [
+            0.9667,
+            0.9667,
+            0.8000,
+            0.7000,
+            0.6800,
+            0.7000,
+            0.5200,
+            0.4000,
+            0.3400,
+            0.3000,
+            0.2333,
+            0.0800,
+            0.0400,
+            0.0000,
+            0.0200,
+            0.0833,
+        ]
 
         ax = Axes(
             x_range=[0, len(ranges) - 1, 1],
@@ -1353,11 +1659,23 @@ class ChessTransformer(Scene):
         first_pts = to_points(first)
         full_pts = to_points(full)
 
-        first_line = VMobject().set_points_as_corners(first_pts).set_stroke(ACCENT, width=4, opacity=0.9)
-        full_line = VMobject().set_points_as_corners(full_pts).set_stroke(ACCENT2, width=4, opacity=0.9)
+        first_line = (
+            VMobject()
+            .set_points_as_corners(first_pts)
+            .set_stroke(ACCENT, width=4, opacity=0.9)
+        )
+        full_line = (
+            VMobject()
+            .set_points_as_corners(full_pts)
+            .set_stroke(ACCENT2, width=4, opacity=0.9)
+        )
 
-        first_dots = VGroup(*[Dot(radius=0.045).set_color(ACCENT).move_to(p) for p in first_pts])
-        full_dots = VGroup(*[Dot(radius=0.045).set_color(ACCENT2).move_to(p) for p in full_pts])
+        first_dots = VGroup(
+            *[Dot(radius=0.045).set_color(ACCENT).move_to(p) for p in first_pts]
+        )
+        full_dots = VGroup(
+            *[Dot(radius=0.045).set_color(ACCENT2).move_to(p) for p in full_pts]
+        )
 
         # X labels (every other to keep readable)
         xlabels = VGroup()
@@ -1368,26 +1686,38 @@ class ChessTransformer(Scene):
                 xlabels.add(lab)
 
         ylab = small_label("accuracy", 22).next_to(ax, LEFT, buff=0.15).rotate(PI / 2)
-        xlab = small_label("puzzle rating range (bucket size = 200)", 22).next_to(ax, DOWN, buff=0.70)
+        xlab = small_label("puzzle rating range (bucket size = 200)", 22).next_to(
+            ax, DOWN, buff=0.70
+        )
 
         leg = VGroup(
-            VGroup(Dot(radius=0.06).set_color(ACCENT), small_label("FirstAcc", 22)).arrange(RIGHT, buff=0.15),
-            VGroup(Dot(radius=0.06).set_color(ACCENT2), small_label("FullAcc", 22)).arrange(RIGHT, buff=0.15),
+            VGroup(
+                Dot(radius=0.06).set_color(ACCENT), small_label("FirstAcc", 22)
+            ).arrange(RIGHT, buff=0.15),
+            VGroup(
+                Dot(radius=0.06).set_color(ACCENT2), small_label("FullAcc", 22)
+            ).arrange(RIGHT, buff=0.15),
         ).arrange(DOWN, buff=0.12)
         leg.move_to(RIGHT * 5.1 + UP * 2.25)
 
-        elo_note = Text(
-            "Estimated playing strength: ~2000–2150 Elo\n(from fastchess + Ordo)",
-            font_size=26,
-            weight=BOLD,
-        ).set_color(HI).set_opacity(0.95)
+        elo_note = (
+            Text(
+                "Estimated playing strength: ~2000–2150 Elo\n(from fastchess + Ordo)",
+                font_size=26,
+                weight=BOLD,
+            )
+            .set_color(HI)
+            .set_opacity(0.95)
+        )
         elo_note.move_to(LEFT * 4.35 + UP * 2.45)
 
         self.play(FadeIn(ax, shift=UP), run_time=T["reveal"])
         self.play(FadeIn(ylab), FadeIn(xlab), FadeIn(xlabels), run_time=T["fade"])
         self.play(Create(first_line), FadeIn(first_dots), run_time=T["reveal"])
         self.play(Create(full_line), FadeIn(full_dots), run_time=T["reveal"])
-        self.play(FadeIn(leg, shift=DOWN), FadeIn(elo_note, shift=DOWN), run_time=T["reveal"])
+        self.play(
+            FadeIn(leg, shift=DOWN), FadeIn(elo_note, shift=DOWN), run_time=T["reveal"]
+        )
         self.wait(T["hold_long"])
 
         self.play(
@@ -1410,33 +1740,71 @@ class ChessTransformer(Scene):
         t12 = title("Two failure modes you saw (common for searchless play)")
         self.play(Transform(t0, t12), run_time=T["fade"])
 
-        f1 = box("1) Missed checkmates", w=5.4, h=1.0, color=WARN, size=28).move_to(UP * 1.6)
-        f2 = box("2) Repeated moves (3-fold)", w=5.4, h=1.0, color=WARN, size=28).next_to(f1, DOWN, buff=0.40)
+        f1 = box("1) Missed checkmates", w=5.4, h=1.0, color=WARN, size=28).move_to(
+            UP * 1.6
+        )
+        f2 = box(
+            "2) Repeated moves (3-fold)", w=5.4, h=1.0, color=WARN, size=28
+        ).next_to(f1, DOWN, buff=0.40)
 
         b = chessboard(2.4).move_to(LEFT * 4.3 + DOWN * 2.0)
-        glow = SurroundingRectangle(b, buff=0.10).set_stroke(HI, width=5).set_opacity(0.85)
-        mate_txt = Text("Mate in 2 exists", font_size=28, weight=BOLD).set_color(HI).next_to(b, RIGHT, buff=0.30).shift(UP * 0.5)
-        wrong = Text("model chooses\nnon-forcing line", font_size=24, weight=BOLD).set_color(BAD).next_to(mate_txt, DOWN, buff=0.20).align_to(mate_txt, LEFT)
+        glow = (
+            SurroundingRectangle(b, buff=0.10).set_stroke(HI, width=5).set_opacity(0.85)
+        )
+        mate_txt = (
+            Text("Mate in 2 exists", font_size=28, weight=BOLD)
+            .set_color(HI)
+            .next_to(b, RIGHT, buff=0.30)
+            .shift(UP * 0.5)
+        )
+        wrong = (
+            Text("model chooses\nnon-forcing line", font_size=24, weight=BOLD)
+            .set_color(BAD)
+            .next_to(mate_txt, DOWN, buff=0.20)
+            .align_to(mate_txt, LEFT)
+        )
 
         A = chip("Position A", GREY_D, 22)
         Bp = chip("Position B", GREY_D, 22)
         loop = VGroup(A, Bp).arrange(RIGHT, buff=0.7).move_to(RIGHT * 3.2 + DOWN * 2.0)
-        c1 = CurvedArrow(A.get_bottom() + DOWN * 0.05, Bp.get_bottom() + DOWN * 0.05, angle=-TAU / 4)
-        c2 = CurvedArrow(Bp.get_top() + UP * 0.05, A.get_top() + UP * 0.05, angle=-TAU / 4)
+        c1 = CurvedArrow(
+            A.get_bottom() + DOWN * 0.05, Bp.get_bottom() + DOWN * 0.05, angle=-TAU / 4
+        )
+        c2 = CurvedArrow(
+            Bp.get_top() + UP * 0.05, A.get_top() + UP * 0.05, angle=-TAU / 4
+        )
         c1.set_stroke(WHITE, opacity=0.55, width=4)
         c2.set_stroke(WHITE, opacity=0.55, width=4)
-        draw = Text("… repeats …", font_size=24, weight=BOLD).set_color(WARN).next_to(loop, DOWN, buff=0.20)
+        draw = (
+            Text("… repeats …", font_size=24, weight=BOLD)
+            .set_color(WARN)
+            .next_to(loop, DOWN, buff=0.20)
+        )
 
-        end = Text(
-            "Without tree search, the model must be *exact* on tactics and endings.\nSmall underfit models often fail here.",
-            font_size=30,
-            weight=BOLD,
-        ).set_opacity(0.95).move_to(DOWN * 3.25)
+        end = (
+            Text(
+                "Without tree search, the model must be *exact* on tactics and endings.\nSmall underfit models often fail here.",
+                font_size=30,
+                weight=BOLD,
+            )
+            .set_opacity(0.95)
+            .move_to(DOWN * 3.25)
+        )
 
         self.play(FadeIn(f1, shift=DOWN), FadeIn(f2, shift=DOWN), run_time=T["reveal"])
         self.play(FadeIn(b, scale=0.98), Create(glow), run_time=T["reveal"])
-        self.play(FadeIn(mate_txt, shift=LEFT), FadeIn(wrong, shift=LEFT), run_time=T["reveal"])
-        self.play(FadeIn(loop, shift=UP), Create(c1), Create(c2), FadeIn(draw, shift=UP), run_time=T["reveal"])
+        self.play(
+            FadeIn(mate_txt, shift=LEFT),
+            FadeIn(wrong, shift=LEFT),
+            run_time=T["reveal"],
+        )
+        self.play(
+            FadeIn(loop, shift=UP),
+            Create(c1),
+            Create(c2),
+            FadeIn(draw, shift=UP),
+            run_time=T["reveal"],
+        )
         self.play(FadeIn(end, shift=UP), run_time=T["reveal"])
         self.wait(T["hold_long"])
 
