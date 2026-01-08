@@ -97,7 +97,7 @@ class OurModel(BaseSection):
                 "label_direction": DOWN,
             },
             y_axis_config={"numbers_to_include": np.arange(2, 5.01, 0.5)},
-        ).next_to(top_text, DOWN, buff=0.5)
+        ).next_to(top_text, DOWN, buff=0.75)
 
         _, smooth_data = get_data_0()
 
@@ -137,7 +137,7 @@ class OurModel(BaseSection):
                 "label_direction": DOWN,
             },
             y_axis_config={"numbers_to_include": np.arange(1, 3.01, 0.2)},
-        ).next_to(top_text, DOWN, buff=0.5)
+        ).next_to(top_text, DOWN, buff=0.75)
 
         _, smooth_data = get_data_1()
 
@@ -172,7 +172,7 @@ class OurModel(BaseSection):
             bar_names=["0-1", "1-2", "2-3", "3-4"],
             x_length=10,
             y_length=5,
-        ).next_to(top_text, DOWN, buff=0.5)
+        ).next_to(top_text, DOWN, buff=0.75)
         self.play(Create(bar_chart))
         self.wait(2)
 
