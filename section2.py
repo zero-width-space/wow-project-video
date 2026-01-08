@@ -854,7 +854,7 @@ class EngineIntro(BaseSection):
 
         new_text = Paragraph(
             "Training is a loop: self-play generates new games, then the network is",
-            "updated with this new data. This repeats as many times as necessary."
+            "updated with this new data. This repeats as many times as necessary.",
             font_size=28,
         ).next_to(top_text, DOWN)
         fit_paragraph(new_text)
