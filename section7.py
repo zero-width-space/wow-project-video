@@ -1,4 +1,4 @@
-from utils import BaseSection
+from utils import BaseSection, VideoMobject
 from manim import *
 
 
@@ -7,10 +7,17 @@ class Ending(BaseSection):
         self.show_section_title("The End", "Thanks and acknowledgements")
 
         body_text = Paragraph(
-            "Thank you for watching this video!",
+            "Our model is now up on Lichess",
+            "(https://lichess.org/@/ChessEngine_AI)",
             font_size=30,
         ).to_edge(UP)
         self.play(Write(body_text))
+        video = (
+            VideoMobject("fools_mate_engine.mp4").scale_to_fit_height(5.5).to_edge(DOWN)
+        )
+        self.add(video)
+        self.wait_until(lambda: video.finished)
+        self.play(*[FadeOut(obj) for obj in self.mobjects if obj is not body_text])
 
         new_text = Paragraph(
             "This project would not have been possible without",

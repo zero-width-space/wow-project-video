@@ -168,19 +168,4 @@ class OurModel(BaseSection):
         ).next_to(top_text, DOWN, buff=0.75)
         self.play(Create(bar_chart))
         self.wait(2)
-
-        self.play(*[FadeOut(obj) for obj in self.mobjects if obj is not top_text])
-
-        new_text = Paragraph(
-            "Our model is now up on Lichess",
-            "(https://lichess.org/@/ChessEngine_AI)",
-            font_size=30,
-        ).to_edge(UP)
-        self.play(Transform(top_text, new_text))
-        video = (
-            VideoMobject("fools_mate_engine.mp4").scale_to_fit_height(5.5).to_edge(DOWN)
-        )
-        self.add(video)
-        self.wait_until(lambda: video.finished)
-
         self.fade_out()

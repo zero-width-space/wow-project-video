@@ -1,4 +1,4 @@
-from utils import BaseSection
+from utils import BaseSection, VideoMobject
 from manim import *
 
 
@@ -8,19 +8,24 @@ class Demonstration(BaseSection):
 
         top_text = Paragraph(
             "Here is a demonstration of our model against a human player",
+            "(sped up for brevity, but run in real time)",
             font_size=30,
         ).to_edge(UP)
         self.play(Write(top_text))
 
-        body_text = Paragraph(
-            "Insert video here",
-            "Insert video here",
-            "Insert video here",
-            "Insert video here",
-            "Insert video here",
-            font="monospace",
-            font_size=32,
-        ).scale(0.5)
-        self.play(Write(body_text))
-        self.wait()
+        video = (
+            VideoMobject("demonstration.mp4", speed=3)
+            .scale_to_fit_height(5.5)
+            .to_edge(DOWN)
+        )
+        self.wait_until(lambda: video.finished)
+        self.play(FadeOut(video))
+
+        new_text = Paragraph(
+            "As you can see, even though it lost in the end, it still",
+            "can close to a draw",
+            font_size=30,
+        ).to_edge(UP)
+        self.play(Transform(top_text, new_text))
+        self.wait(2)
         self.fade_out()
