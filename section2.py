@@ -850,7 +850,7 @@ class EngineIntro(BaseSection):
         ).next_to(top_text, DOWN)
         fit_paragraph(new_text)
         self.play(Transform(body_text, new_text))
-        self.wait(2)
+        self.wait(3)
 
         new_text = Paragraph(
             "Training is a loop: self-play generates new games, then the network is",
@@ -876,6 +876,7 @@ class EngineIntro(BaseSection):
         self.play(Write(body_text))
 
         self.show_transformer()
+        self.wait()
 
         self.play(
             *[FadeOut(obj) for obj in self.mobjects if obj not in (top_text, body_text)]
