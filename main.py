@@ -18,4 +18,4 @@ with open(VIDEO_FILE, "w") as file:
         )
     )
 
-os.system("ffmpeg -f concat -i video_files.txt output.mp4")
+os.system("ffmpeg -y -f concat -i video_files.txt output.mp4")
