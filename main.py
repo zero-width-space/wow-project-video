@@ -1,15 +1,14 @@
 import glob
 import os
 
-VIDEO_FILE = "video_files.txt"
 RESOLUTION = {
-    "l": "480p30",
+    "l": "480p15",
     "m": "720p30",
     "h": "1080p60",
     "p": "1440p60",
     "k": "2160p60",
 }
-QUALITY = "h"
+QUALITY = "l"
 
 parts = [
     "section0",
@@ -21,10 +20,10 @@ parts = [
     "section7",
 ]
 
-for part in parts:
-    os.system(f"manim -q{QUALITY} {part}.py")
+# for part in parts:
+#     os.system(f"manim -q{QUALITY} {part}.py")
 
-with open(VIDEO_FILE, "w") as file:
+with open("video_files.txt", "w") as file:
     for part in parts:
         pattern = f"media/videos/{part}/{RESOLUTION[QUALITY]}/*.mp4"
         for path in sorted(glob.glob(pattern)):
